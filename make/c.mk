@@ -2,8 +2,6 @@
 .PHONY: clean_c check-syntax
 .SUFFIXES: .c
 CC = cc
-CFLAGS += -Werror=cast-qual -fPIC -pthread
-LDFLAGS += -pthread
 COBJS = ${CSRCS:.c=.o}
 OBJS += ${COBJS}
 
