@@ -1,12 +1,13 @@
 Q ?= @
+TOPDIR ?= .
 
 # Toplevel rules
-.PHONY: all clean topdir _all dep
+.PHONY: all clean topdir sub_all _all dep
 .SUFFIXES:
 
-all: dep _all
-
-_all: dep
+all: dep
+	${MAKE} sub_all
+	${MAKE} _all
 
 clean:
 	${Q}rm -rf ${EXTRA_CLEAN}
@@ -18,7 +19,7 @@ topdir:
 # Sub rules
 .PHONY: ${SUBDIRS:=.all} ${SUBDIRS:=.clean} ${SUBDIRS:=.dep}
 
-_all: ${SUBDIRS:=.all}
+sub_all: ${SUBDIRS:=.all}
 
 clean: ${SUBDIRS:=.clean}
 
