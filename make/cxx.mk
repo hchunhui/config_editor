@@ -2,7 +2,7 @@
 .PHONY: clean_cxx
 .SUFFIXES: .cpp .cxx .cc
 CXX = c++
-LD = c++
+CCLD = ${CXX}
 CXXOBJS = ${CXXSRCS:.cpp=.o}
 CXXOBJS := ${CXXOBJS:.cxx=.o}
 CXXOBJS := ${CXXOBJS:.cc=.o}

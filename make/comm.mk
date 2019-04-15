@@ -36,7 +36,8 @@ ${SUBDIRS:=.dep}:
 # Link rules
 .PHONY: clean_ld
 .SUFFIXES: .o
-LD ?= cc
+LD = CCLD="${CCLD}" ${TOPDIR}/make/scripts/gcc-ld
+CCLD ?= ${CC}
 AR = ar
 
 _all: ${LIB} ${PROG}
@@ -47,7 +48,7 @@ ${LIB}: ${OBJS}
 
 ${PROG}: ${OBJS}
 	@${TOPDIR}/make/scripts/out.sh LD "${OBJS}" "$@"
-	${Q}${LD} -Wl,--start-group ${OBJS} -Wl,--end-group -o ${PROG} ${LDFLAGS}
+	${Q}${LD} --start-group ${OBJS} --end-group -o ${PROG} ${LDFLAGS}
 
 clean_ld:
 	${Q}rm -f ${LIB} ${PROG}
