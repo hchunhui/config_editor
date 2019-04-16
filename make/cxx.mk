@@ -22,8 +22,8 @@ ${LIB}: ${CXXOBJS}
 	${Q}${CXX} ${CFLAGS} ${CXXFLAGS} -c $< -o $@
 
 .depends_cxx: ${CXXSRCS}
-	@${TOPDIR}/make/scripts/out.sh DEP "${CXXSRCS}" "$@"
-	${Q}${CXX} ${CFLAGS} ${CXXFLAGS} -MM ${CXXSRCS} 2> /dev/null > $@ || exit 0
+	@${TOPDIR}/make/scripts/out.sh DEP "$^$>" "$@"
+	${Q}${CXX} ${CFLAGS} ${CXXFLAGS} -MM $^$> 2> /dev/null > $@ || exit 0
 
 clean_cxx:
 	${Q}rm -f ${CXXOBJS} .depends_cxx

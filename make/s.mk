@@ -17,8 +17,8 @@ ${PROG}: ${SOBJS}
 	${Q}${AS} -D__ASSEMBLY__ ${CFLAGS} ${SFLAGS} -c $< -o $@
 
 .depends_s: ${SSRCS}
-	@${TOPDIR}/make/scripts/out.sh DEP "${SSRCS}" "$@"
-	${Q}${AS} -D__ASSEMBLY__ ${CFLAGS} ${SFLAGS} -MM ${SSRCS} 2> /dev/null > $@ || exit 0
+	@${TOPDIR}/make/scripts/out.sh DEP "$^$>" "$@"
+	${Q}${AS} -D__ASSEMBLY__ ${CFLAGS} ${SFLAGS} -MM $^$> 2> /dev/null > $@ || exit 0
 
 clean_s:
 	${Q}rm -f ${SOBJS} .depends_s

@@ -54,8 +54,8 @@ ${MLCLIB}: ${MLOBJS}
 	${Q}${MLOPT} ${MLFLAGS} -g -c $< -o $@
 
 .depends_ml: ${MLSRCS}
-	@${TOPDIR}/make/scripts/out.sh DEP "${MLSRCS}" "$@"
-	${Q}${MLDEP} ${MLSRCS} > $@
+	@${TOPDIR}/make/scripts/out.sh DEP "$^$>" "$@"
+	${Q}${MLDEP} $^$> > $@
 
 clean_ml:
 	${Q}rm -f ${MLOBJS} ${MLXOBJS} ${MLSRCS:.ml=.cmi} ${MLSRCS:.ml=.o} ${MLSRCS:.ml=.annot} ${MLPROG} ${MLPROG:.byte=.native} ${MLLIB} ${MLLIB:.cma=.cmxa} ${MLLIB:.cma=.a} ${MLCLIB} ${MLCLIB:.o=.cds} .depends_ml

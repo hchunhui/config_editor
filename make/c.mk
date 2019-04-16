@@ -13,8 +13,8 @@ ${PROG}: ${COBJS}
 	${Q}${CC} ${CFLAGS} -c $< -o $@
 
 .depends_c: ${CSRCS}
-	@${TOPDIR}/make/scripts/out.sh DEP "${CSRCS}" "$@"
-	${Q}${CC} ${CFLAGS} -MM ${CSRCS} 2> /dev/null > $@ || exit 0
+	@${TOPDIR}/make/scripts/out.sh DEP "$^$>" "$@"
+	${Q}${CC} ${CFLAGS} -MM $^$> 2> /dev/null > $@ || exit 0
 
 clean_c:
 	${Q}rm -f ${COBJS} .depends_c
