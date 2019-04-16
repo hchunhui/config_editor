@@ -44,7 +44,7 @@ _all: ${LIB} ${PROG}
 
 ${LIB}: ${OBJS}
 	@${TOPDIR}/make/scripts/out.sh AR "${OBJS}" "$@"
-	${Q}${AR} rcsT ${LIB} ${OBJS}
+	${Q}${AR} rcs ${LIB} ${OBJS}
 
 ${PROG}: ${OBJS}
 	@${TOPDIR}/make/scripts/out.sh LD "${OBJS}" "$@"
