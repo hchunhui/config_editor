@@ -1,13 +1,14 @@
 Q ?= @
 TOPDIR ?= .
+SELF ?= Makefile
 
 # Toplevel rules
 .PHONY: all clean topdir sub_all _all dep
 .SUFFIXES:
 
 all: dep
-	${MAKE} sub_all
-	${MAKE} _all
+	${MAKE} -f ${SELF} sub_all
+	${MAKE} -f ${SELF} _all
 
 clean:
 	${Q}rm -rf ${EXTRA_CLEAN}
@@ -31,6 +32,22 @@ ${SUBDIRS:=.clean}:
 	${MAKE} -C ${@:.clean=} clean
 ${SUBDIRS:=.dep}:
 	${MAKE} -C ${@:.dep=} dep
+
+
+.PHONY: ${SUBMAKES:=.all} ${SUBMAKES:=.clean} ${SUBMAKES:=.dep}
+
+sub_all: ${SUBMAKES:=.all}
+
+clean: ${SUBMAKES:=.clean}
+
+dep: ${SUBMAKES:=.dep}
+
+${SUBMAKES:=.all}:
+	${MAKE} -f ${@:.all=} SELF=${@:.all=}
+${SUBMAKES:=.clean}:
+	${MAKE} -f ${@:.clean=} SELF=${@:.clean=} clean
+${SUBMAKES:=.dep}:
+	${MAKE} -f ${@:.dep=} SELF=${@:.dep=} dep
 
 
 # Link rules

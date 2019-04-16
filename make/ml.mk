@@ -53,13 +53,13 @@ ${MLCLIB}: ${MLOBJS}
 	@${TOPDIR}/make/scripts/out.sh OPT "$<" "$@"
 	${Q}${MLOPT} ${MLFLAGS} -g -c $< -o $@
 
-.depends_ml: ${MLSRCS}
+.depends_ml.${SELF}: ${MLSRCS}
 	@${TOPDIR}/make/scripts/out.sh DEP "$^$>" "$@"
 	${Q}${MLDEP} $^$> > $@
 
 clean_ml:
-	${Q}rm -f ${MLOBJS} ${MLXOBJS} ${MLSRCS:.ml=.cmi} ${MLSRCS:.ml=.o} ${MLSRCS:.ml=.annot} ${MLPROG} ${MLPROG:.byte=.native} ${MLLIB} ${MLLIB:.cma=.cmxa} ${MLLIB:.cma=.a} ${MLCLIB} ${MLCLIB:.o=.cds} .depends_ml
+	${Q}rm -f ${MLOBJS} ${MLXOBJS} ${MLSRCS:.ml=.cmi} ${MLSRCS:.ml=.o} ${MLSRCS:.ml=.annot} ${MLPROG} ${MLPROG:.byte=.native} ${MLLIB} ${MLLIB:.cma=.cmxa} ${MLLIB:.cma=.a} ${MLCLIB} ${MLCLIB:.o=.cds} .depends_ml.${SELF}
 clean: clean_ml
 
-dep: .depends_ml
--include .depends_ml
+dep: .depends_ml.${SELF}
+-include .depends_ml.${SELF}
