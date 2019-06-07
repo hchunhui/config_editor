@@ -9,12 +9,7 @@ STDLIBDIR != ${MLC} -where
 LIBDIR = ${STDLIBDIR}/..
 CFLAGS += -I ${STDLIBDIR}
 LDFLAGS += -L ${STDLIBDIR} -lcamlrun -lm -ldl -lunix -lcamlstr
-PPXD = ${LIBDIR}/ppx_deriving
 MLFLAGS += -annot #-dsource
-MLFLAGS += -I ${LIBDIR}/findlib
-MLFLAGS += -ppx "${PPXD}/ppx_deriving ${PPXD}/ppx_deriving_show.cma ${PPXD}/ppx_deriving_ord.cma ${PPXD}/ppx_deriving_eq.cma" \
- -I ${PPXD} -I ${LIBDIR}/result
-MLMODS += unix.cma str.cma dynlink.cma findlib.cma result.cma ppx_deriving_runtime.cma
 MLXMODS = ${MLMODS:.cma=.cmxa}
 MLOBJS += ${MLSRCS:.ml=.cmo}
 MLXOBJS = ${MLOBJS:.cmo=.cmx}
