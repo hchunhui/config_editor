@@ -16,8 +16,9 @@ MLFLAGS += -ppx "${PPXD}/ppx_deriving ${PPXD}/ppx_deriving_show.cma ${PPXD}/ppx_
  -I ${PPXD} -I ${LIBDIR}/result
 MLMODS += unix.cma str.cma dynlink.cma findlib.cma result.cma ppx_deriving_runtime.cma
 MLXMODS = ${MLMODS:.cma=.cmxa}
-MLOBJS = ${MLSRCS:.ml=.cmo}
-MLXOBJS = ${MLSRCS:.ml=.cmx}
+MLOBJS += ${MLSRCS:.ml=.cmo}
+MLXOBJS = ${MLOBJS:.cmo=.cmx}
+MLXOBJS := ${MLXOBJS:.cma=.cmxa}
 OBJS += ${MLCLIB}
 
 ${PROG}: ${MLCLIB}
