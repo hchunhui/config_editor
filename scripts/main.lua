@@ -1,7 +1,7 @@
 if not nk then
     nk = require('nk')
 end
-yaml = require("yaml")
+yaml = require("parser.yaml")
 
 --enum nk_heading
 NK_UP = 0
