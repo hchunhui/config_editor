@@ -4,6 +4,5 @@
 *.a
 *.so
 driver/driver
-scripts/driver
+scripts/_helper.c
 scripts/nk.so
-

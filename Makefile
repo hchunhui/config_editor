@@ -1,7 +1,6 @@
 TOPDIR = .
-SUBDIRS = lua-nk driver scripts
+SUBDIRS = lua-nk scripts driver
 
 include ${TOPDIR}/make/comm.mk
 
-driver.all: lua-nk.all
-scripts.all: driver.all lua-nk.all
+driver.all: lua-nk.all scripts.all

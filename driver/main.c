@@ -21,6 +21,28 @@ static int report (lua_State *L, int status) {
   return status;
 }
 
+struct mem_file {
+  const char *name;
+  const char *start;
+  const char *end;
+};
+
+extern struct mem_file _myfiles[];
+static int my_loader(lua_State *L)
+{
+  const char *name = luaL_checkstring(L, 1);
+  struct mem_file *p = _myfiles;
+
+  for(; p->name; p++) {
+    if (strcmp(name, p->name) == 0) {
+      int status = luaL_loadbuffer(L, p->start, p->end - p->start, p->name);
+      report(L, status);
+      return 1;
+    }
+  }
+  return 0;
+}
+
 static int msghandler (lua_State *L) {
   const char *msg = lua_tostring(L, 1);
   if (msg == NULL) {  /* is error object not a string? */
@@ -49,6 +71,10 @@ static int docall (lua_State *L, int narg, int nres) {
   return status;
 }
 
+static const char *stub =
+  "table.insert(package.searchers, 1, my_loader)\n"
+  "my_loader = nil\n";
+
 int luaopen_nk (lua_State *L);
 static int pmain (lua_State *L) {
   int argc = (int)lua_tointeger(L, 1);
@@ -66,9 +92,17 @@ static int pmain (lua_State *L) {
   }
   lua_setglobal(L, "arg");
 
-  int status = luaL_loadfile(L, "main.lua");
+  lua_pushcfunction(L, my_loader);
+  lua_setglobal(L, "my_loader");
+
+  int status = luaL_dostring(L, stub);
   if (status == LUA_OK) {
-    status = docall(L, 0, 1);
+    lua_pushcfunction(L, my_loader);
+    lua_pushstring(L, "main");
+    status = docall(L, 1, 1);
+    if (status == LUA_OK) {
+      status = docall(L, 0, 1);
+    }
   }
 
   report(L, status);

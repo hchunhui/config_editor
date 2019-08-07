@@ -2,6 +2,7 @@ TOPDIR = ..
 PROG = driver
 CSRCS = main.c
 OBJS += ${TOPDIR}/lua-nk/nk.a
+OBJS += ${TOPDIR}/scripts/_build.o
 
 LDFLAGS = ${LUA_LDFLAGS} ${XFT_LDFLAGS}
 

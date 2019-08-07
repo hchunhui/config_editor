@@ -1,13 +1,38 @@
 TOPDIR = ..
+PROG = _build.o
+CSRCS = _helper.c
+LUASRCS = yaml.lua main.lua
 
-all: nk.so driver
+LDFLAGS = -r -nostdlib
 
-nk.so:
-	ln -sf ${TOPDIR}/lua-nk/nk.so .
-driver:
-	ln -sf ${TOPDIR}/driver/driver .
+include ${TOPDIR}/make/comm.mk
+include ${TOPDIR}/make/c.mk
 
-dep:
+.PHONY: clean_helper
 
-clean:
-	@rm -f nk.so driver
+_helper.c: ${LUASRCS}
+	${Q}./mkhelper ${LUASRCS} > $@
+
+clean_helper:
+	${Q}rm -f _helper.c
+
+clean: clean_helper
+
+
+.PHONY: clean_lua
+.SUFFIXES: .lua
+
+LUAOBJS = ${LUASRCS:.lua=.o}
+OBJS += ${LUAOBJS}
+
+${LIB}: ${LUAOBJS}
+${PROG}: ${LUAOBJS}
+
+.lua.o:
+	@${TOPDIR}/make/scripts/out.sh LUAC "$<" "$@"
+	${Q}${LD} -r -nostdlib -b binary $< -o $@
+
+clean_lua:
+	${Q}rm -f ${LUAOBJS}
+
+clean: clean_lua
