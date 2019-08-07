@@ -322,6 +322,4 @@ function mkgui()
    return gui
 end
 
-gui = mkgui()
-
-nk.main()
+return nk.main(mkgui()) == 0

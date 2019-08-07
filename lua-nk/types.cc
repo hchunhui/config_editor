@@ -561,7 +561,7 @@ sleep_for(long t)
  * ===============================================================*/
 
 int
-xmain(void)
+xmain(std::shared_ptr<LuaObj> gui)
 {
     XWindow xw;
     long dt;
@@ -632,7 +632,7 @@ xmain(void)
 
         /* GUI */
         auto r = lua->call<bool, std::shared_ptr<LuaObj>, struct nk_context *>
-          (lua->getglobal("gui"), ctx);
+          (gui, ctx);
         if (r.ok()) {
           if (!r.get())
             break;
