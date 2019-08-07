@@ -106,7 +106,7 @@ static int pmain (lua_State *L) {
   }
 
   report(L, status);
-  return 1;
+  return status == LUA_OK;
 }
 
 int main (int argc, char **argv) {
