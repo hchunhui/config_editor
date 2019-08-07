@@ -1,0 +1,9 @@
+*~
+.depends*
+*.o
+*.a
+*.so
+driver/driver
+scripts/driver
+scripts/nk.so
+
