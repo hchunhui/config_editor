@@ -6,7 +6,15 @@ local function match_qstring(s, i) --- "str"
    while r do
       table.insert(t, r)
       i = i + string.len(r)
-      r = string.match(s, "^\\.", i) or
+      r =
+	 -- Escape sequences in C
+	 string.match(s, "^\\[0-7][0-7]?[0-7]?", i) or
+	 string.match(s, "^\\x%x%x?", i) or
+	 string.match(s, "^\\u%x%x%x%x", i) or
+	 string.match(s, "^\\U%x%x%x%x%x%x%x%x", i) or
+	 string.match(s, "^\\[abefnrtv\\'\"?]", i) or
+	 -- YAML specific
+	 string.match(s, "^\\[/N_LP \t]", i) or
 	 string.match(s, "^[^\"\\]+", i)
    end
 
