@@ -15,16 +15,13 @@ local function printer(quote)
 	 else
 	    local s = {}
 	    for _, i in ipairs(r.val) do
-	       local sep = ""
 	       local v = rec(i.val, n + 2)
-	       if string.match(string.sub(i.key, -1, -1), "['\"]") then
-		  sep = " "
-	       end
+	       local qkey = quote(i.key, n)
 	       if i.cmt or (i.val.type ~= "str" and not i.val.inline) then
 		  local cmt = i.cmt or ""
-		  table.insert(s, string.rep(" ", n) .. i.key .. sep .. ":" .. cmt .. "\n" .. v)
+		  table.insert(s, string.rep(" ", n) .. qkey .. ":" .. cmt .. "\n" .. v)
 	       else
-		  table.insert(s, string.rep(" ", n) .. i.key .. sep .. ": " .. v)
+		  table.insert(s, string.rep(" ", n) .. qkey .. ": " .. v)
 	       end
 	    end
 	    if n == 0 then
