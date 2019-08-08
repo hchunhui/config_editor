@@ -58,10 +58,14 @@ local function lexer(s, match_string)
       { m = match("(-)[ \n]"),
 	a = function (t, pos)
 	   emit_brackets(pos + 1, "arr")
+	   emit("-", t)
       end },
 
       { m = match("{"),
 	a = function (t)
+	   if flevel[#flevel] == "[" then
+	      emit("-", "")
+	   end
 	   table.insert(flevel, "{")
 	   emit("{", "map")
       end },
@@ -77,6 +81,9 @@ local function lexer(s, match_string)
 
       { m = match("%["),
 	a = function (t)
+	   if flevel[#flevel] == "[" then
+	      emit("-", "")
+	   end
 	   table.insert(flevel, "[")
 	   emit("{", "arr")
       end },
@@ -102,6 +109,9 @@ local function lexer(s, match_string)
 	      emit("k", t)
 	   else
 	      check_indent(pos)
+	      if flevel[#flevel] == "[" then
+		 emit("-", "")
+	      end
 	      emit("v", t)
 	   end
       end },
@@ -179,6 +189,15 @@ local function parser(get)
       return nil
    end
 
+   local function parse_dash()
+      skip_comment()
+      if t and t.type == "-" then
+	 t = get()
+	 return true, parse_comment()
+      end
+      return nil
+   end
+
    local function parse()
       local s = {}
 
@@ -200,10 +219,12 @@ local function parser(get)
 	       key, cmt = parse_key()
 	    end
 	 elseif s.type == "arr" then
-	    local val = parse()
-	    while val do
-	       table.insert(s.val, {val = val})
-	       val = parse()
+	    local dash, cmt = parse_dash()
+	    while dash do
+	       local val = parse()
+	       if not val then error("bad value") end
+	       table.insert(s.val, {val = val, cmt = cmt})
+	       dash, cmt = parse_dash()
 	    end
 	 end
 
