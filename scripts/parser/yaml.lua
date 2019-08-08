@@ -403,8 +403,7 @@ local function printer(r, n)
    return l
 end
 
-return function(inp)
-   local r = parser(lexer(inp))
-   print(printer(r, 0))
-   return r
-end
+return {
+   parser = function(inp) return parser(lexer(inp)) end,
+   printer = function(tree) return printer(tree, 0) end,
+}

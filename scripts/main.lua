@@ -297,7 +297,7 @@ end
 
 function mkgui()
    inp = io.read("*all")
-   tree = yaml(inp)
+   tree = yaml.parser(inp)
    hide = {}
 
    function gui(ctx)
