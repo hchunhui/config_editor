@@ -103,7 +103,7 @@ local function tree_assoc(tree, key)
    if key:sub(1, 1) == "@" then
       j = tonumber(key:sub(2, -1)) + 1
    else
-      for k, v in ipairs(tree) do
+      for k, v in ipairs(tree.val) do
 	 if v.key == key then
 	    j = k
 	    break
@@ -118,31 +118,31 @@ local function cmds_exec(cmds, tree)
       if c.type == "delete" then
 	 for i = 1, #c.path - 1 do
 	    local j = tree_assoc(tree, c.path[i])
-	    tree = tree[j].val
+	    tree = tree.val[j].val
 	 end
 	 if #c.path > 0 then
 	    local j = tree_assoc(tree, c.path[#c.path])
-	    table.remove(tree, j)
+	    table.remove(tree.val, j)
 	 end
       elseif c.type == "append" then
 	 for i = 1, #c.path do
 	    local j = tree_assoc(tree, c.path[i])
-	    tree = tree[j].val
+	    tree = tree.val[j].val
 	 end
 	 if tree.type == "map" then
-	    table.insert(tree, {key = keyname, val = c.val})
+	    table.insert(tree.val, {key = keyname, val = c.val})
 	 elseif tree.type == "arr" then
-	    table.insert(tree, {val = c.val})
+	    table.insert(tree.val, {val = c.val})
 	 end
       elseif c.type == "prepend" then
 	 for i = 1, #c.path do
 	    local j = tree_assoc(tree, c.path[i])
-	    tree = tree[j].val
+	    tree = tree.val[j].val
 	 end
 	 if tree.type == "map" then
-	    table.insert(tree, 1, {key = keyname, val = c.val})
+	    table.insert(tree.val, 1, {key = keyname, val = c.val})
 	 elseif tree.type == "arr" then
-	    table.insert(tree, 1, {val = c.val})
+	    table.insert(tree.val, 1, {val = c.val})
 	 end
       end
    end
@@ -189,11 +189,11 @@ local function show_popup_map(ctx, cmds, path)
 	 ctx:contextual_close()
       end
       if ctx:button_label("prepend_array") then
-	 table.insert(cmds, {type = "prepend", path = path, val = {type = "arr"}})
+	 table.insert(cmds, {type = "prepend", path = path, val = {type = "arr", val = {}}})
 	 ctx:contextual_close()
       end
       if ctx:button_label("prepend_map") then
-	 table.insert(cmds, {type = "prepend", path = path, val = {type = "map"}})
+	 table.insert(cmds, {type = "prepend", path = path, val = {type = "map", val = {}}})
 	 ctx:contextual_close()
       end
       if ctx:button_label("append") then
@@ -277,7 +277,7 @@ local function show_tree(ctx, hide, cmds, path, k0, v0)
       ctx:label(k0, NK_TEXT_LEFT)
       if not hide[pstr] then
 	 if v0.type == "map" then
-	    for i, v in ipairs(v0) do
+	    for i, v in ipairs(v0.val) do
 	       if v.cmt then
 		  if ctx:widget_is_hovered() then
 		     ctx:tooltip(v.cmt)
@@ -286,7 +286,7 @@ local function show_tree(ctx, hide, cmds, path, k0, v0)
 	       show_tree(ctx, hide, cmds, path_append(path, v.key), v.key, v.val)
 	    end
 	 else
-	    for i, v in ipairs(v0) do
+	    for i, v in ipairs(v0.val) do
 	       local k = "@" .. tostring(i - 1)
 	       local action = show_tree(ctx, hide, cmds, path_append(path, k), k, v.val)
 	    end

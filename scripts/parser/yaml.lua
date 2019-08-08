@@ -280,19 +280,20 @@ local function parser(get)
 	 t = get()
       elseif t and t.type == "{" then
 	 s.type = t.val
+	 s.val = {}
 	 t = get()
 	 if s.type == "map" then
 	    local key, cmt = parse_key()
 	    while key do
 	       local val = parse()
 	       if not val then error("bad value") end
-	       table.insert(s, {key = key, val = val, cmt = cmt})
+	       table.insert(s.val, {key = key, val = val, cmt = cmt})
 	       key, cmt = parse_key()
 	    end
 	 elseif s.type == "arr" then
 	    local val = parse()
 	    while val do
-	       table.insert(s, {val = val})
+	       table.insert(s.val, {val = val})
 	       val = parse()
 	    end
 	 end
@@ -317,16 +318,16 @@ local function printer(r, n)
    if r.type == "str" then
       l = r.val
    elseif r.type == "map" then
-      if r.inline then
+      if r.inline or #r.val == 0 then
 	 local s = {}
-	 for _, i in ipairs(r) do
+	 for _, i in ipairs(r.val) do
 	    local v = printer(i.val, 0)
 	    table.insert(s, i.key .. ": " .. v)
 	 end
 	 l = "{ " .. table.concat(s, ", ") .. " }"
       else
 	 local s = {}
-	 for _, i in ipairs(r) do
+	 for _, i in ipairs(r.val) do
 	    local sep = ""
 	    local v = printer(i.val, n + 2)
 	    if string.match(string.sub(i.key, -1, -1), "['\"]") then
@@ -346,16 +347,16 @@ local function printer(r, n)
 	 end
       end
    elseif r.type == "arr" then
-      if r.inline then
+      if r.inline or #r.val == 0 then
 	 local s = {}
-	 for _, i in ipairs(r) do
+	 for _, i in ipairs(r.val) do
 	    local v = printer(i.val, 0)
 	    table.insert(s, v)
 	 end
 	 l = "[ " .. table.concat(s, ", ") .. " ]"
       else
 	 local s = {}
-	 for _, i in ipairs(r) do
+	 for _, i in ipairs(r.val) do
 	    local v = printer(i.val, n + 2)
 	    table.insert(s, string.rep(" ", n) .. "- " .. string.gsub(v, "^[ ]+", ""))
 	 end
