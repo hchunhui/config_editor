@@ -1,7 +1,7 @@
 TOPDIR = ..
 PROG = _build.o
 CSRCS = _helper.c
-LUASRCS = parser/yaml.lua main.lua
+LUASRCS = yaml.lua yaml/parser.lua yaml/printer.lua yaml/str.lua main.lua
 
 LDFLAGS = -r -nostdlib
 
