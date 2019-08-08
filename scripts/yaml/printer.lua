@@ -3,7 +3,7 @@ local function printer(quote)
       local l
 
       if r.type == "str" then
-	 l = quote(r.val, n)
+	 l = string.rep(" ", n) .. quote(r.val, n)
       elseif r.type == "map" then
 	 if r.inline or #r.val == 0 then
 	    local s = {}
@@ -21,7 +21,7 @@ local function printer(quote)
 		  local cmt = i.cmt or ""
 		  table.insert(s, string.rep(" ", n) .. qkey .. ":" .. cmt .. "\n" .. v)
 	       else
-		  table.insert(s, string.rep(" ", n) .. qkey .. ": " .. v)
+		  table.insert(s, string.rep(" ", n) .. qkey .. ": " .. string.gsub(v, "^[ ]+", ""))
 	       end
 	    end
 	    if n == 0 then
@@ -42,7 +42,11 @@ local function printer(quote)
 	    local s = {}
 	    for _, i in ipairs(r.val) do
 	       local v = rec(i.val, n + 2)
-	       table.insert(s, string.rep(" ", n) .. "- " .. string.gsub(v, "^[ ]+", ""))
+	       if i.cmt then
+		  table.insert(s, string.rep(" ", n) .. "-" .. i.cmt .. "\n" .. v)
+	       else
+		  table.insert(s, string.rep(" ", n) .. "- " .. string.gsub(v, "^[ ]+", ""))
+	       end
 	    end
 	    l = table.concat(s, "\n")
 	 end
