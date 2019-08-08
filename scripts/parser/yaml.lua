@@ -320,11 +320,38 @@ local function parser(get)
    return parse()
 end
 
+local function quote_string_once(s, n)
+   if match_sqstring(s, 1) == s or
+      match_qstring(s, 1) == s then
+      return s
+   end
+
+   if match_xstring(s .. "\n", 1) == s then
+      return string.gsub(s, "\n[ ]+", "\n" .. string.rep(" ", n))
+   end
+
+   if string.len(s) == 0 or string.find(s, "[ ,{}%[%]:#'\"]") then
+      if string.find(s, "\"") and
+      not string.find(s, "[\a\b\x1b\f\n\r\t\v]") then
+	 return "'" .. string.gsub(s, "'", "''") .. "'"
+      else
+	 local quote_tbl = {
+	    ["\a"] = "\\a", ["\b"] = "\\b", ["\x1b"] = "\\e", ["\f"] = "\\f",
+	    ["\n"] = "\\n", ["\r"] = "\\r", ["\t"] = "\\t", ["\v"] = "\\v",
+	    ["\""] = "\\\"", ["\\"] = "\\\\",
+	 }
+	 return "\"" ..
+	    string.gsub(s, "[\a\b\x1b\f\n\r\t\v\"\\]", quote_tbl) .. "\""
+      end
+   end
+   return s
+end
+
 local function printer(r, n)
    local l
 
    if r.type == "str" then
-      l = r.val
+      l = quote_string_once(r.val, n)
    elseif r.type == "map" then
       if r.inline or #r.val == 0 then
 	 local s = {}
