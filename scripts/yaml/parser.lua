@@ -244,6 +244,7 @@ end
 
 return function (match_string)
    return function (s)
-      return parser(lexer(s, match_string))
+      local s_unix = string.gsub(s, "\r\n", "\n")
+      return parser(lexer(s_unix, match_string))
    end
 end
