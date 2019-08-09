@@ -234,8 +234,30 @@ local function show_popup_val(ctx, v)
    end
 end
 
-local function show_tree(ctx, hide, cmds, path, k0, v0)
+local function show_pcmt(ctx, n, pcmt)
+   if pcmt then
+      ctx:layout_row_template_begin(25)
+      ctx:layout_row_template_push_static(25 * n)
+      ctx:layout_row_template_push_dynamic()
+      ctx:layout_row_template_end()
+      for l in string.gmatch(pcmt, "[ ]*([^\n]*)") do
+	 ctx:label("", NK_TEXT_LEFT)
+	 ctx:label(l, NK_TEXT_LEFT)
+      end
+   end
+end
+
+local function show_cmt(ctx, cmt)
+   if cmt then
+      if ctx:widget_is_hovered() then
+	 ctx:tooltip(cmt)
+      end
+   end
+end
+
+local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
    if v0.type == "str" then
+      show_pcmt(ctx, #path + 1, v0.pcmt)
       ctx:layout_row_template_begin(25)
       ctx:layout_row_template_push_static(25 * (#path + 1))
       ctx:layout_row_template_push_static(275 - 25 * #path)
@@ -245,15 +267,11 @@ local function show_tree(ctx, hide, cmds, path, k0, v0)
       ctx:label("", NK_TEXT_LEFT)
 
       show_popup_str(ctx, cmds, path)
+      show_cmt(ctx, cmt)
       ctx:label(k0, NK_TEXT_LEFT)
 
-      if v0.cmt then
-	 if ctx:widget_is_hovered() then
-	    ctx:tooltip(v0.cmt)
-	 end
-      end
-
       show_popup_val(ctx, v0)
+      show_cmt(ctx, v0.cmt)
       v0.val = ctx:edit(v0.val)
    else
       ctx:layout_row_template_begin(25)
@@ -274,21 +292,21 @@ local function show_tree(ctx, hide, cmds, path, k0, v0)
       end
 
       show_popup_map(ctx, cmds, path)
+      show_cmt(ctx, cmt)
       ctx:label(k0, NK_TEXT_LEFT)
+
       if not hide[pstr] then
+	 show_pcmt(ctx, #path + 2, v0.pcmt)
 	 if v0.type == "map" then
 	    for i, v in ipairs(v0.val) do
-	       if v.cmt then
-		  if ctx:widget_is_hovered() then
-		     ctx:tooltip(v.cmt)
-		  end
-	       end
-	       show_tree(ctx, hide, cmds, path_append(path, v.key), v.key, v.val)
+	       show_pcmt(ctx, #path + 2, v.pcmt)
+	       show_tree(ctx, hide, cmds, path_append(path, v.key), v.key, v.val, v.cmt)
 	    end
 	 else
 	    for i, v in ipairs(v0.val) do
+	       show_pcmt(ctx, #path + 2, v.pcmt)
 	       local k = "@" .. tostring(i - 1)
-	       local action = show_tree(ctx, hide, cmds, path_append(path, k), k, v.val)
+	       show_tree(ctx, hide, cmds, path_append(path, k), k, v.val, v.cmt)
 	    end
 	 end
       end
@@ -297,7 +315,7 @@ end
 
 function mkgui()
    inp = io.read("*all")
-   tree = yaml.parser(inp)
+   t = yaml.parser(inp)
    hide = {}
 
    function gui(ctx)
@@ -307,9 +325,9 @@ function mkgui()
 	 ctx:label("Config Editor", NK_TEXT_LEFT)
 
 	 local cmds = {}
-	 show_tree(ctx, hide, cmds, {}, "/", tree)
+	 show_tree(ctx, hide, cmds, {}, "/", t, nil)
 
-	 cmds_exec(cmds, tree)
+	 cmds_exec(cmds, t)
       end
       ctx:_end()
 

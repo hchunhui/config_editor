@@ -15,6 +15,7 @@ local function printer(quote)
 	 else
 	    local s = {}
 	    for _, i in ipairs(r.val) do
+	       if i.pcmt then table.insert(s, i.pcmt) end
 	       local v = rec(i.val, n + 2)
 	       local qkey = quote(i.key, n)
 	       if i.cmt or (i.val.type ~= "str" and not i.val.inline) then
@@ -41,6 +42,7 @@ local function printer(quote)
 	 else
 	    local s = {}
 	    for _, i in ipairs(r.val) do
+	       if i.pcmt then table.insert(s, i.pcmt) end
 	       local v = rec(i.val, n + 2)
 	       if i.cmt then
 		  table.insert(s, string.rep(" ", n) .. "-" .. i.cmt .. "\n" .. v)
@@ -53,6 +55,7 @@ local function printer(quote)
       end
 
       if r.cmt then l = l .. r.cmt end
+      if r.pcmt then l = r.pcmt .. "\n" .. l end
       return l
    end
    return rec

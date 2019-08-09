@@ -126,7 +126,7 @@ local function lexer(s, match_string)
 
       { m = match("\n[ ]*#[^\n]*"),
 	a = function (t)
-	   emit("#", t)
+	   emit("##", string.sub(t, 2, -1))
       end },
 
       { m = match("\n"),
@@ -165,13 +165,26 @@ end
 local function parser(get)
    local t = get()
 
-   local function skip_comment()
-      while t.type == "#" do t = get() end
+   local pend_cmts = {}
+   local function push_comment()
+      while t and (t.type == "#" or t.type == "##") do
+	 table.insert(pend_cmts, t.val)
+	 t = get()
+      end
+   end
+   local function pop_comment()
+      if #pend_cmts == 0 then
+	 return nil
+      end
+
+      local r = table.concat(pend_cmts, "\n")
+      pend_cmts = {}
+      return r
    end
 
    local function parse_comment()
       local cmt
-      if t and t.type == "#" and string.sub(t.val, 1, 1) ~= "\n" then
+      if t and t.type == "#" then
 	 cmt = t.val
 	 t = get()
       end
@@ -179,10 +192,9 @@ local function parser(get)
    end
 
    local function parse_key()
-      skip_comment()
+      push_comment()
       if t and t.type == "k" then
 	 local key = t.val
-	 local cmt
 	 t = get()
 	 return key, parse_comment()
       end
@@ -190,7 +202,7 @@ local function parser(get)
    end
 
    local function parse_dash()
-      skip_comment()
+      push_comment()
       if t and t.type == "-" then
 	 t = get()
 	 return true, parse_comment()
@@ -201,7 +213,8 @@ local function parser(get)
    local function parse()
       local s = {}
 
-      skip_comment()
+      push_comment()
+      s.pcmt = pop_comment()
       if t and t.type == "v" then
 	 s.type = "str"
 	 s.val = t.val
@@ -212,23 +225,26 @@ local function parser(get)
 	 t = get()
 	 if s.type == "map" then
 	    local key, cmt = parse_key()
+	    local pcmt = pop_comment()
 	    while key do
 	       local val = parse()
 	       if not val then error("bad value") end
-	       table.insert(s.val, {key = key, val = val, cmt = cmt})
+	       table.insert(s.val, {key = key, val = val, cmt = cmt, pcmt = pcmt})
 	       key, cmt = parse_key()
+	       pcmt = pop_comment()
 	    end
 	 elseif s.type == "arr" then
 	    local dash, cmt = parse_dash()
+	    local pcmt = pop_comment()
 	    while dash do
 	       local val = parse()
 	       if not val then error("bad value") end
-	       table.insert(s.val, {val = val, cmt = cmt})
+	       table.insert(s.val, {val = val, cmt = cmt, pcmt = pcmt})
 	       dash, cmt = parse_dash()
+	       pcmt = pop_comment()
 	    end
 	 end
 
-	 skip_comment()
 	 if t and t.type ~= "}" then error("bad }") end
 	 s.inline = t.val
 	 t = get()
