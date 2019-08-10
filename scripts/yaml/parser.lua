@@ -43,7 +43,7 @@ local function lexer(s, match_string)
 	 return
       end
 
-      if pos <= level[#level] then
+      if pos < level[#level] then
 	 error("check indent")
       end
    end
@@ -55,7 +55,7 @@ local function lexer(s, match_string)
    end
 
    local matchers = {
-      { m = match("(-)[ \n]"),
+      { m = match("(%-)[ \n]"),
 	a = function (t, pos)
 	   emit_brackets(pos + 1, "arr")
 	   emit("-", t)
