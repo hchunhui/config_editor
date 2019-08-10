@@ -27,11 +27,24 @@ struct mem_file {
   const char *end;
 };
 
+struct mem_cfile {
+  const char *name;
+  lua_CFunction func;
+};
+
 extern struct mem_file _myfiles[];
+
+int luaopen_nk_core (lua_State *L);
+struct mem_cfile _mycfiels[] = {
+  {"nk.core", luaopen_nk_core},
+  {NULL, NULL},
+};
+
 static int my_loader(lua_State *L)
 {
   const char *name = luaL_checkstring(L, 1);
   struct mem_file *p = _myfiles;
+  struct mem_cfile *q = _mycfiels;
 
   for(; p->name; p++) {
     if (strcmp(name, p->name) == 0) {
@@ -40,6 +53,14 @@ static int my_loader(lua_State *L)
       return 1;
     }
   }
+
+  for(; q->name; q++) {
+    if (strcmp(name, q->name) == 0) {
+      lua_pushcfunction(L, q->func);
+      return 1;
+    }
+  }
+
   return 0;
 }
 
@@ -75,15 +96,12 @@ static const char *stub =
   "table.insert(package.searchers, 1, my_loader)\n"
   "my_loader = nil\n";
 
-int luaopen_nk (lua_State *L);
 static int pmain (lua_State *L) {
   int argc = (int)lua_tointeger(L, 1);
   char **argv = (char **)lua_touserdata(L, 2);
   luaL_checkversion(L);  /* check that interpreter has correct version */
 
   luaL_openlibs(L);  /* open standard libraries */
-  luaopen_nk(L);
-  lua_setglobal(L, "nk");
 
   lua_createtable(L, argc - 1, 1);
   for (int i = 0; i < argc; i++) {

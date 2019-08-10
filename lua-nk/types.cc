@@ -667,7 +667,7 @@ static const luaL_Reg funcs[] = {
 	{ NULL, NULL }
 };
 
-extern "C" int luaopen_nk (lua_State *L) {
+extern "C" int luaopen_nk_core (lua_State *L) {
 	lua = new Lua(L);
 	luaL_newlib(L, funcs);
         types_init(L);

@@ -1,7 +1,7 @@
 TOPDIR = ..
 PROG = _build.o
 CSRCS = _helper.c
-LUASRCS = yaml.lua yaml/parser.lua yaml/printer.lua yaml/str.lua main.lua
+LUASRCS = yaml.lua yaml/parser.lua yaml/printer.lua yaml/str.lua nk.lua main.lua
 
 LDFLAGS = -r -nostdlib
 
@@ -10,7 +10,7 @@ include ${TOPDIR}/make/c.mk
 
 .PHONY: clean_helper
 
-_helper.c: ${LUASRCS}
+_helper.c: ${LUASRCS} Makefile
 	${Q}./mkhelper ${LUASRCS} > $@
 
 clean_helper:

@@ -1,87 +1,5 @@
-if not nk then
-    nk = require('nk')
-end
+nk = require("nk")
 yaml = require("yaml")
-
---enum nk_heading
-NK_UP = 0
-NK_RIGHT = 1
-NK_DOWN = 2
-NK_LEFT = 3
-
---enum nk_button_behavior
-NK_BUTTON_DEFAULT = 0
-NK_BUTTON_REPEATER = 1
-
---enum nk_modify
-NK_FIXED = 0
-NK_MODIFIABLE = 1
-
---enum nk_orientation
-NK_VERTICAL = 0
-NK_HORIZONTAL = 1
-
---enum nk_collapse_states
-NK_MINIMIZED = 0
-NK_MAXIMIZED = 1
-
---enum nk_show_states
-NK_HIDDEN = 0
-NK_SHOWN = 1
-
---enum nk_chart_type
-NK_CHART_LINES = 0
-NK_CHART_COLUMN = 1
-NK_CHART_MAX = 2
-
---enum nk_chart_event
-NK_CHART_HOVERING = 0x01
-NK_CHART_CLICKED = 0x02
-
---enum nk_color_format
-NK_RGB = 0
-NK_RGBA = 1
-
---enum nk_popup_type
-NK_POPUP_STATIC = 0
-NK_POPUP_DYNAMIC = 1
-
---enum nk_layout_format
-NK_DYNAMIC = 0
-NK_STATIC = 1
-
---enum nk_tree_type
-NK_TREE_NODE = 0
-NK_TREE_TAB = 1
-
---enum nk_symbol_type
-NK_SYMBOL_NONE = 0
-NK_SYMBOL_X = 1
-NK_SYMBOL_UNDERSCORE = 2
-NK_SYMBOL_CIRCLE_SOLID = 3
-NK_SYMBOL_CIRCLE_OUTLINE = 4
-NK_SYMBOL_RECT_SOLID = 5
-NK_SYMBOL_RECT_OUTLINE = 6
-NK_SYMBOL_TRIANGLE_UP = 7
-NK_SYMBOL_TRIANGLE_DOWN = 8
-NK_SYMBOL_TRIANGLE_LEFT = 9
-NK_SYMBOL_TRIANGLE_RIGHT = 10
-NK_SYMBOL_PLUS = 11
-NK_SYMBOL_MINUS = 12
-NK_SYMBOL_MAX = 13
-
---enum nk_text_align
-NK_TEXT_ALIGN_LEFT        = 0x01
-NK_TEXT_ALIGN_CENTERED    = 0x02
-NK_TEXT_ALIGN_RIGHT       = 0x04
-NK_TEXT_ALIGN_TOP         = 0x08
-NK_TEXT_ALIGN_MIDDLE      = 0x10
-NK_TEXT_ALIGN_BOTTOM      = 0x20
-
---enum nk_text_alignment
-NK_TEXT_LEFT        = NK_TEXT_ALIGN_MIDDLE|NK_TEXT_ALIGN_LEFT
-NK_TEXT_CENTERED    = NK_TEXT_ALIGN_MIDDLE|NK_TEXT_ALIGN_CENTERED
-NK_TEXT_RIGHT       = NK_TEXT_ALIGN_MIDDLE|NK_TEXT_ALIGN_RIGHT
 
 local keyname = "default"
 
@@ -152,7 +70,7 @@ local function show_popup_str(ctx, cmds, path)
    local bounds = ctx:widget_bounds()
    if ctx:contextual_begin(0, nk.vec2(100, 300), bounds) then
       ctx:layout_row_dynamic(25, 1);
-      ctx:label(path_show(path), NK_TEXT_LEFT)
+      ctx:label(path_show(path), nk.TEXT_LEFT)
       if ctx:button_label("delete") then
 	 table.insert(cmds, {type = "delete", path = path})
 	 ctx:contextual_close()
@@ -168,7 +86,7 @@ local function show_popup_map(ctx, cmds, path)
    local bounds = ctx:widget_bounds()
    if ctx:contextual_begin(0, nk.vec2(100, 300), bounds) then
       ctx:layout_row_dynamic(25, 1);
-      ctx:label(path_show(path), NK_TEXT_LEFT)
+      ctx:label(path_show(path), nk.TEXT_LEFT)
       if #path > 0 then
 	 if ctx:button_label("delete") then
 	    table.insert(cmds, {type = "delete", path = path})
@@ -211,7 +129,7 @@ local function show_popup_val(ctx, v)
    local bounds = ctx:widget_bounds()
    if ctx:contextual_begin(0, nk.vec2(100, 300), bounds) then
       ctx:layout_row_dynamic(25, 1);
-      ctx:label(v.val, NK_TEXT_LEFT)
+      ctx:label(v.val, nk.TEXT_LEFT)
 
       if ctx:button_label("copy") then
 	 local f = io.popen("xsel -b", "w")
@@ -241,8 +159,8 @@ local function show_pcmt(ctx, n, pcmt)
       ctx:layout_row_template_push_dynamic()
       ctx:layout_row_template_end()
       for l in string.gmatch(pcmt, "[ ]*([^\n]*)") do
-	 ctx:label("", NK_TEXT_LEFT)
-	 ctx:label(l, NK_TEXT_LEFT)
+	 ctx:label("", nk.TEXT_LEFT)
+	 ctx:label(l, nk.TEXT_LEFT)
       end
    end
 end
@@ -264,11 +182,11 @@ local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
       ctx:layout_row_template_push_dynamic()
       ctx:layout_row_template_end()
 
-      ctx:label("", NK_TEXT_LEFT)
+      ctx:label("", nk.TEXT_LEFT)
 
       show_popup_str(ctx, cmds, path)
       show_cmt(ctx, cmt)
-      ctx:label(k0, NK_TEXT_LEFT)
+      ctx:label(k0, nk.TEXT_LEFT)
 
       show_popup_val(ctx, v0)
       show_cmt(ctx, v0.cmt)
@@ -280,12 +198,12 @@ local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
       ctx:layout_row_template_push_dynamic()
       ctx:layout_row_template_end()
 
-      ctx:label("", NK_TEXT_LEFT)
+      ctx:label("", nk.TEXT_LEFT)
 
       local pstr = path_show(path)
-      local symbol = NK_SYMBOL_TRIANGLE_DOWN
+      local symbol = nk.SYMBOL_TRIANGLE_DOWN
       if hide[pstr] then
-	 symbol = NK_SYMBOL_TRIANGLE_RIGHT
+	 symbol = nk.SYMBOL_TRIANGLE_RIGHT
       end
       if ctx:button_symbol(symbol) then
 	 hide[pstr] = not hide[pstr]
@@ -293,7 +211,7 @@ local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
 
       show_popup_map(ctx, cmds, path)
       show_cmt(ctx, cmt)
-      ctx:label(k0, NK_TEXT_LEFT)
+      ctx:label(k0, nk.TEXT_LEFT)
 
       if not hide[pstr] then
 	 show_pcmt(ctx, #path + 2, v0.pcmt)
@@ -322,7 +240,7 @@ function mkgui()
       if ctx:_begin("Demo", nk.rect(0, 0, 800, 800), 0) then
 
 	 ctx:layout_row_dynamic(25, 1)
-	 ctx:label("Config Editor", NK_TEXT_LEFT)
+	 ctx:label("Config Editor", nk.TEXT_LEFT)
 
 	 local cmds = {}
 	 show_tree(ctx, hide, cmds, {}, "/", t, nil)
