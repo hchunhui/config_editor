@@ -1,16 +1,18 @@
 local function printer(quote)
-   function rec(r, n)
+   function rec(r, n, unsafe)
       local l
+
+      if r.inline then unsafe = true end
 
       if r.type == "nul" then
 	 l = string.rep(" ", n) .. r.val
       elseif r.type == "str" then
-	 l = string.rep(" ", n) .. quote(r.val, n)
+	 l = string.rep(" ", n) .. quote(r.val, n, unsafe)
       elseif r.type == "map" then
 	 if r.inline or #r.val == 0 then
 	    local s = {}
 	    for _, i in ipairs(r.val) do
-	       local v = rec(i.val, 0)
+	       local v = rec(i.val, 0, unsafe)
 	       table.insert(s, i.key .. ": " .. v)
 	    end
 	    l = "{ " .. table.concat(s, ", ") .. " }"
@@ -18,8 +20,8 @@ local function printer(quote)
 	    local s = {}
 	    for _, i in ipairs(r.val) do
 	       if i.pcmt then table.insert(s, i.pcmt) end
-	       local v = rec(i.val, n + 2)
-	       local qkey = quote(i.key, n)
+	       local v = rec(i.val, n + 2, unsafe)
+	       local qkey = quote(i.key, n, unsafe)
 	       if i.cmt or (i.val.type ~= "str" and i.val.type ~= "nul" and not i.val.inline) then
 		  local cmt = i.cmt or ""
 		  table.insert(s, string.rep(" ", n) .. qkey .. ":" .. cmt .. "\n" .. v)
@@ -33,7 +35,7 @@ local function printer(quote)
 	 if r.inline or #r.val == 0 then
 	    local s = {}
 	    for _, i in ipairs(r.val) do
-	       local v = rec(i.val, 0)
+	       local v = rec(i.val, 0, unsafe)
 	       table.insert(s, v)
 	    end
 	    l = "[ " .. table.concat(s, ", ") .. " ]"
@@ -41,7 +43,7 @@ local function printer(quote)
 	    local s = {}
 	    for _, i in ipairs(r.val) do
 	       if i.pcmt then table.insert(s, i.pcmt) end
-	       local v = rec(i.val, n + 2)
+	       local v = rec(i.val, n + 2, unsafe)
 	       if i.cmt then
 		  table.insert(s, string.rep(" ", n) .. "-" .. i.cmt .. "\n" .. v)
 	       else
