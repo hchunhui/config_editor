@@ -112,7 +112,11 @@ local function lexer(s, match_string)
 	      if flevel[#flevel] == "[" then
 		 emit("-", "")
 	      end
-	      emit("v", t)
+	      if t == "~" or t == "null" or t == "Null" or t == "NULL" then
+		 emit("v", {type = "nul", val = t})
+	      else
+		 emit("v", {type = "str", val = t})
+	      end
 	   end
       end },
 
@@ -216,8 +220,8 @@ local function parser(get)
       push_comment()
       s.pcmt = pop_comment()
       if t and t.type == "v" then
-	 s.type = "str"
-	 s.val = t.val
+	 s.type = t.val.type
+	 s.val = t.val.val
 	 t = get()
       elseif t and t.type == "{" then
 	 s.type = t.val
@@ -228,7 +232,6 @@ local function parser(get)
 	    local pcmt = pop_comment()
 	    while key do
 	       local val = parse()
-	       if not val then error("bad value") end
 	       table.insert(s.val, {key = key, val = val, cmt = cmt, pcmt = pcmt})
 	       key, cmt = parse_key()
 	       pcmt = pop_comment()
@@ -238,7 +241,6 @@ local function parser(get)
 	    local pcmt = pop_comment()
 	    while dash do
 	       local val = parse()
-	       if not val then error("bad value") end
 	       table.insert(s.val, {val = val, cmt = cmt, pcmt = pcmt})
 	       dash, cmt = parse_dash()
 	       pcmt = pop_comment()
@@ -249,7 +251,8 @@ local function parser(get)
 	 s.inline = t.val
 	 t = get()
       else
-	 return nil
+	 s.type = "nul"
+	 s.val = ""
       end
 
       s.cmt = parse_comment()

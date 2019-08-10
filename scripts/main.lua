@@ -174,7 +174,22 @@ local function show_cmt(ctx, cmt)
 end
 
 local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
-   if v0.type == "str" then
+   if v0.type == "nul" then
+      show_pcmt(ctx, #path + 1, v0.pcmt)
+      ctx:layout_row_template_begin(25)
+      ctx:layout_row_template_push_static(25 * (#path + 1))
+      ctx:layout_row_template_push_static(275 - 25 * #path)
+      ctx:layout_row_template_push_dynamic()
+      ctx:layout_row_template_end()
+
+      ctx:label("", nk.TEXT_LEFT)
+
+      show_popup_str(ctx, cmds, path)
+      show_cmt(ctx, cmt)
+      ctx:label(k0, nk.TEXT_LEFT)
+
+      ctx:label("null", nk.TEXT_LEFT)
+   elseif v0.type == "str" then
       show_pcmt(ctx, #path + 1, v0.pcmt)
       ctx:layout_row_template_begin(25)
       ctx:layout_row_template_push_static(25 * (#path + 1))

@@ -2,7 +2,9 @@ local function printer(quote)
    function rec(r, n)
       local l
 
-      if r.type == "str" then
+      if r.type == "nul" then
+	 l = string.rep(" ", n) .. r.val
+      elseif r.type == "str" then
 	 l = string.rep(" ", n) .. quote(r.val, n)
       elseif r.type == "map" then
 	 if r.inline or #r.val == 0 then
@@ -18,7 +20,7 @@ local function printer(quote)
 	       if i.pcmt then table.insert(s, i.pcmt) end
 	       local v = rec(i.val, n + 2)
 	       local qkey = quote(i.key, n)
-	       if i.cmt or (i.val.type ~= "str" and not i.val.inline) then
+	       if i.cmt or (i.val.type ~= "str" and i.val.type ~= "nul" and not i.val.inline) then
 		  local cmt = i.cmt or ""
 		  table.insert(s, string.rep(" ", n) .. qkey .. ":" .. cmt .. "\n" .. v)
 	       else
