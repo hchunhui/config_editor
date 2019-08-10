@@ -75,7 +75,7 @@ local function match_xstring(s, i) --- XXX: |str >str
 	 if l then
 	    local m = string.len(string.match(l, "^[ ]*"))
 	    if l ~= "\n" then
-	       if m ~= n then
+	       if m < n then
 		  break
 	       end
 	    end
@@ -103,7 +103,8 @@ local function quote_string_once(s, n)
    end
 
    if match_xstring(s .. "\n", 1) == s then
-      return string.gsub(s, "\n[ ]+", "\n" .. string.rep(" ", n))
+      local sp = string.match(s, "\n[ ]+")
+      return string.gsub(s, sp, "\n" .. string.rep(" ", n))
    end
 
    if string.len(s) == 0 or string.find(s, "[ ,{}%[%]:#'\"]") then
