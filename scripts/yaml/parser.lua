@@ -229,21 +229,19 @@ local function parser(get)
 	 t = get()
 	 if s.type == "map" then
 	    local key, cmt = parse_key()
-	    local pcmt = pop_comment()
 	    while key do
+	       local pcmt = pop_comment()
 	       local val = parse()
 	       table.insert(s.val, {key = key, val = val, cmt = cmt, pcmt = pcmt})
 	       key, cmt = parse_key()
-	       pcmt = pop_comment()
 	    end
 	 elseif s.type == "arr" then
 	    local dash, cmt = parse_dash()
-	    local pcmt = pop_comment()
 	    while dash do
+	       local pcmt = pop_comment()
 	       local val = parse()
 	       table.insert(s.val, {val = val, cmt = cmt, pcmt = pcmt})
 	       dash, cmt = parse_dash()
-	       pcmt = pop_comment()
 	    end
 	 end
 
