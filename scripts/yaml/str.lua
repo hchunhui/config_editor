@@ -66,11 +66,10 @@ local function match_rstring(s, i, unsafe) --- str
 end
 
 local function match_xstring(s, i) --- XXX: |str >str
-   local r = string.match(s, "^|\n[ ]+", i) or
-      string.match(s, "^>\n[ ]+", i)
-   if r then
-      local n = string.len(r) - 2
-      local j = i + 2
+   local r1, r2 = string.match(s, "^([|>][%+%-]?\n)([ ]+)", i)
+   if r1 then
+      local n = string.len(r2)
+      local j = i + string.len(r1)
       while true do
 	 local l = string.match(s, "^[^\n]*\n", j)
 	 if l then

@@ -27,11 +27,7 @@ local function printer(quote)
 		  table.insert(s, string.rep(" ", n) .. qkey .. ": " .. string.gsub(v, "^[ ]+", ""))
 	       end
 	    end
-	    if n == 0 then
-	       l = table.concat(s, "\n\n")
-	    else
-	       l = table.concat(s, "\n")
-	    end
+	    l = table.concat(s, "\n")
 	 end
       elseif r.type == "arr" then
 	 if r.inline or #r.val == 0 then
