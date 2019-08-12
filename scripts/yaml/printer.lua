@@ -4,15 +4,13 @@ local function printer(quote)
    function rec(r, n, unsafe)
       local l
 
-      if r.inline then unsafe = true end
-
       if r.type == tree.PRIM then
 	 l = string.rep(" ", n) .. quote(r.val, n, unsafe)
       elseif r.type == tree.MAP then
 	 if r.inline or r:iter_len() == 0 then
 	    local s = {}
 	    for key, x in r:iter() do
-	       local v = rec(x.val, 0, unsafe)
+	       local v = rec(x.val, 0, unsafe or r.inline)
 	       table.insert(s, key .. ": " .. v)
 	    end
 	    l = "{ " .. table.concat(s, ", ") .. " }"
@@ -35,7 +33,7 @@ local function printer(quote)
 	 if r.inline or r:iter_len() == 0 then
 	    local s = {}
 	    for _, x in r:iter() do
-	       local v = rec(x.val, 0, unsafe)
+	       local v = rec(x.val, 0, unsafe or r.inline)
 	       table.insert(s, v)
 	    end
 	    l = "[ " .. table.concat(s, ", ") .. " ]"
@@ -54,8 +52,8 @@ local function printer(quote)
 	 end
       end
 
-      if r.cmt then l = l .. r.cmt end
-      if r.pcmt then l = r.pcmt .. "\n" .. l end
+      if not unsafe and r.cmt then l = l .. r.cmt end
+      if not unsafe and r.pcmt then l = r.pcmt .. "\n" .. l end
       return l
    end
    return rec
