@@ -1,8 +1,8 @@
-local str = require("yaml.str")
+local prim = require("yaml.prim")
 local parser = require("yaml.parser")
 local printer = require("yaml.printer")
 
 return {
-   parser = parser(str.match),
-   printer = printer(str.quote_once),
+   parser = parser(prim.match),
+   printer = printer(prim.quote_once),
 }

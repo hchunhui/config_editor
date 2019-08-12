@@ -103,7 +103,7 @@ local function show_popup_map(ctx, cmds, path)
 	 end
       end
       if ctx:button_label("prepend") then
-	 table.insert(cmds, {type = "prepend", path = path, val = {type = "str", val = ""}})
+	 table.insert(cmds, {type = "prepend", path = path, val = {type = "prim", val = ""}})
 	 ctx:contextual_close()
       end
       if ctx:button_label("prepend_array") then
@@ -115,7 +115,7 @@ local function show_popup_map(ctx, cmds, path)
 	 ctx:contextual_close()
       end
       if ctx:button_label("append") then
-	 table.insert(cmds, {type = "append", path = path, val = {type = "str", val = ""}})
+	 table.insert(cmds, {type = "append", path = path, val = {type = "prim", val = ""}})
 	 ctx:contextual_close()
       end
       if ctx:button_label("cancel") then
@@ -174,7 +174,7 @@ local function show_cmt(ctx, cmt)
 end
 
 local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
-   if v0.type == "str" then
+   if v0.type == "prim" then
       show_pcmt(ctx, #path + 1, v0.pcmt)
       ctx:layout_row_template_begin(25)
       ctx:layout_row_template_push_static(25 * (#path + 1))
