@@ -1,5 +1,6 @@
 nk = require("nk")
 yaml = require("yaml")
+tree = require("tree")
 
 local keyname = "default"
 
@@ -47,9 +48,9 @@ local function cmds_exec(cmds, tree)
 	    local j = tree_assoc(tree, c.path[i])
 	    tree = tree.val[j].val
 	 end
-	 if tree.type == "map" then
+	 if tree.type == tree.MAP then
 	    table.insert(tree.val, {key = keyname, val = c.val})
-	 elseif tree.type == "arr" then
+	 elseif tree.type == tree.ARRAY then
 	    table.insert(tree.val, {val = c.val})
 	 end
       elseif c.type == "prepend" then
@@ -57,9 +58,9 @@ local function cmds_exec(cmds, tree)
 	    local j = tree_assoc(tree, c.path[i])
 	    tree = tree.val[j].val
 	 end
-	 if tree.type == "map" then
+	 if tree.type == tree.MAP then
 	    table.insert(tree.val, 1, {key = keyname, val = c.val})
-	 elseif tree.type == "arr" then
+	 elseif tree.type == tree.ARRAY then
 	    table.insert(tree.val, 1, {val = c.val})
 	 end
       end
@@ -103,19 +104,19 @@ local function show_popup_map(ctx, cmds, path)
 	 end
       end
       if ctx:button_label("prepend") then
-	 table.insert(cmds, {type = "prepend", path = path, val = {type = "prim", val = ""}})
+	 table.insert(cmds, {type = "prepend", path = path, val = tree.new(tree.PRIM, "")})
 	 ctx:contextual_close()
       end
       if ctx:button_label("prepend_array") then
-	 table.insert(cmds, {type = "prepend", path = path, val = {type = "arr", val = {}}})
+	 table.insert(cmds, {type = "prepend", path = path, val = tree.new(tree.ARRAY)})
 	 ctx:contextual_close()
       end
       if ctx:button_label("prepend_map") then
-	 table.insert(cmds, {type = "prepend", path = path, val = {type = "map", val = {}}})
+	 table.insert(cmds, {type = "prepend", path = path, val = tree.new(tree.MAP)})
 	 ctx:contextual_close()
       end
       if ctx:button_label("append") then
-	 table.insert(cmds, {type = "append", path = path, val = {type = "prim", val = ""}})
+	 table.insert(cmds, {type = "append", path = path, val = tree.new(tree.PRIM, "")})
 	 ctx:contextual_close()
       end
       if ctx:button_label("cancel") then
@@ -174,7 +175,7 @@ local function show_cmt(ctx, cmt)
 end
 
 local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
-   if v0.type == "prim" then
+   if v0.type == tree.PRIM then
       show_pcmt(ctx, #path + 1, v0.pcmt)
       ctx:layout_row_template_begin(25)
       ctx:layout_row_template_push_static(25 * (#path + 1))
@@ -215,13 +216,13 @@ local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
 
       if not hide[pstr] then
 	 show_pcmt(ctx, #path + 2, v0.pcmt)
-	 if v0.type == "map" then
-	    for i, v in ipairs(v0.val) do
+	 if v0.type == tree.MAP then
+	    for k, v in v0:iter() do
 	       show_pcmt(ctx, #path + 2, v.pcmt)
-	       show_tree(ctx, hide, cmds, path_append(path, v.key), v.key, v.val, v.cmt)
+	       show_tree(ctx, hide, cmds, path_append(path, k), k, v.val, v.cmt)
 	    end
 	 else
-	    for i, v in ipairs(v0.val) do
+	    for i, v in v0:iter() do
 	       show_pcmt(ctx, #path + 2, v.pcmt)
 	       local k = "@" .. tostring(i - 1)
 	       show_tree(ctx, hide, cmds, path_append(path, k), k, v.val, v.cmt)

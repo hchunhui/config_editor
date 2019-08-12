@@ -1,49 +1,51 @@
+local tree = require("tree")
+
 local function printer(quote)
    function rec(r, n, unsafe)
       local l
 
       if r.inline then unsafe = true end
 
-      if r.type == "prim" then
+      if r.type == tree.PRIM then
 	 l = string.rep(" ", n) .. quote(r.val, n, unsafe)
-      elseif r.type == "map" then
-	 if r.inline or #r.val == 0 then
+      elseif r.type == tree.MAP then
+	 if r.inline or r:iter_len() == 0 then
 	    local s = {}
-	    for _, i in ipairs(r.val) do
-	       local v = rec(i.val, 0, unsafe)
-	       table.insert(s, i.key .. ": " .. v)
+	    for key, x in r:iter() do
+	       local v = rec(x.val, 0, unsafe)
+	       table.insert(s, key .. ": " .. v)
 	    end
 	    l = "{ " .. table.concat(s, ", ") .. " }"
 	 else
 	    local s = {}
-	    for _, i in ipairs(r.val) do
-	       if i.pcmt then table.insert(s, i.pcmt) end
-	       local v = rec(i.val, n + 2, unsafe)
-	       local qkey = quote(i.key, n, unsafe)
-	       if i.cmt or (i.val.type ~= "prim" and not i.val.inline) then
-		  local cmt = i.cmt or ""
-		  table.insert(s, string.rep(" ", n) .. qkey .. ":" .. cmt .. "\n" .. v)
+	    for key, x in r:iter() do
+	       if x.pcmt then table.insert(s, x.pcmt) end
+	       local v = rec(x.val, n + 2, unsafe)
+	       local qkey = quote(key, n, unsafe)
+	       if x.cmt or (x.val.type ~= tree.PRIM and not x.val.inline) then
+		  x.cmt = x.cmt or ""
+		  table.insert(s, string.rep(" ", n) .. qkey .. ":" .. x.cmt .. "\n" .. v)
 	       else
 		  table.insert(s, string.rep(" ", n) .. qkey .. ": " .. string.gsub(v, "^[ ]+", ""))
 	       end
 	    end
 	    l = table.concat(s, "\n")
 	 end
-      elseif r.type == "arr" then
-	 if r.inline or #r.val == 0 then
+      elseif r.type == tree.ARRAY then
+	 if r.inline or r:iter_len() == 0 then
 	    local s = {}
-	    for _, i in ipairs(r.val) do
-	       local v = rec(i.val, 0, unsafe)
+	    for _, x in r:iter() do
+	       local v = rec(x.val, 0, unsafe)
 	       table.insert(s, v)
 	    end
 	    l = "[ " .. table.concat(s, ", ") .. " ]"
 	 else
 	    local s = {}
-	    for _, i in ipairs(r.val) do
-	       if i.pcmt then table.insert(s, i.pcmt) end
-	       local v = rec(i.val, n + 2, unsafe)
-	       if i.cmt then
-		  table.insert(s, string.rep(" ", n) .. "-" .. i.cmt .. "\n" .. v)
+	    for _, x in r:iter() do
+	       if x.pcmt then table.insert(s, x.pcmt) end
+	       local v = rec(x.val, n + 2, unsafe)
+	       if x.cmt then
+		  table.insert(s, string.rep(" ", n) .. "-" .. x.cmt .. "\n" .. v)
 	       else
 		  table.insert(s, string.rep(" ", n) .. "- " .. string.gsub(v, "^[ ]+", ""))
 	       end

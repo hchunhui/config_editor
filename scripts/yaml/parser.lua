@@ -1,3 +1,5 @@
+local tree = require("tree")
+
 local function lexer(s, match_string)
    local pend = {}
    local function emit(t, v)
@@ -57,7 +59,7 @@ local function lexer(s, match_string)
    local matchers = {
       { m = match("(%-)[ \n]"),
 	a = function (t, pos)
-	   emit_brackets(pos + 1, "arr")
+	   emit_brackets(pos + 1, tree.ARRAY)
 	   emit("-", t)
       end },
 
@@ -67,7 +69,7 @@ local function lexer(s, match_string)
 	      emit("-", "")
 	   end
 	   table.insert(flevel, "{")
-	   emit("{", "map")
+	   emit("{", tree.MAP)
       end },
 
       { m = match("}"),
@@ -85,7 +87,7 @@ local function lexer(s, match_string)
 	      emit("-", "")
 	   end
 	   table.insert(flevel, "[")
-	   emit("{", "arr")
+	   emit("{", tree.ARRAY)
       end },
 
       { m = match("%]"),
@@ -105,14 +107,14 @@ local function lexer(s, match_string)
 	   local x = match("([ ]*:)[ \n]")(s, i)
 	   if x then
 	      update(x)
-	      emit_brackets(pos, "map")
+	      emit_brackets(pos, tree.MAP)
 	      emit("k", t)
 	   else
 	      check_indent(pos)
 	      if flevel[#flevel] == "[" then
 		 emit("-", "")
 	      end
-		 emit("v", {type = "prim", val = t})
+	      emit("v", t)
 	   end
       end },
 
@@ -211,32 +213,34 @@ local function parser(get)
    end
 
    local function parse()
-      local s = {}
+      local s
 
       push_comment()
-      s.pcmt = pop_comment()
+      local pcmt = pop_comment()
+
       if t and t.type == "v" then
-	 s.type = t.val.type
-	 s.val = t.val.val
+	 s = tree.new(tree.PRIM, t.val)
 	 t = get()
       elseif t and t.type == "{" then
-	 s.type = t.val
-	 s.val = {}
+	 local ty = t.val
+	 s = tree.new(ty)
 	 t = get()
-	 if s.type == "map" then
+	 if ty == tree.MAP then
 	    local key, cmt = parse_key()
 	    while key do
 	       local pcmt = pop_comment()
 	       local val = parse()
-	       table.insert(s.val, {key = key, val = val, cmt = cmt, pcmt = pcmt})
+	       s:set(key, val, cmt, pcmt)
 	       key, cmt = parse_key()
 	    end
-	 elseif s.type == "arr" then
+	 elseif ty == tree.ARRAY then
+	    local i = 1
 	    local dash, cmt = parse_dash()
 	    while dash do
 	       local pcmt = pop_comment()
 	       local val = parse()
-	       table.insert(s.val, {val = val, cmt = cmt, pcmt = pcmt})
+	       s:set(i, val, cmt, pcmt)
+	       i = i + 1
 	       dash, cmt = parse_dash()
 	    end
 	 end
@@ -245,10 +249,10 @@ local function parser(get)
 	 s.inline = t.val
 	 t = get()
       else
-	 s.type = "prim"
-	 s.val = ""
+	 s = tree.new(tree.PRIM, "")
       end
 
+      s.pcmt = pcmt
       s.cmt = parse_comment()
       return s
    end
