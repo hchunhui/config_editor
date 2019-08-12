@@ -97,6 +97,10 @@ local function match_string(s, i, flevel)
 end
 
 local function quote_string_once(s, n, unsafe)
+   if s == "" then
+      return "~"
+   end
+
    if match_sqstring(s, 1) == s or
       match_qstring(s, 1) == s then
       return s
@@ -107,7 +111,7 @@ local function quote_string_once(s, n, unsafe)
       return string.gsub(s, sp, "\n" .. string.rep(" ", n))
    end
 
-   if string.len(s) == 0 or match_rstring(s, 1, unsafe) ~= s then
+   if match_rstring(s, 1, unsafe) ~= s then
       if string.find(s, "\"") and
       not string.find(s, "[\a\b\x1b\f\n\r\t\v]") then
 	 return "'" .. string.gsub(s, "'", "''") .. "'"

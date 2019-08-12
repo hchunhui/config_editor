@@ -112,11 +112,7 @@ local function lexer(s, match_string)
 	      if flevel[#flevel] == "[" then
 		 emit("-", "")
 	      end
-	      if t == "~" or t == "null" or t == "Null" or t == "NULL" then
-		 emit("v", {type = "nul", val = t})
-	      else
 		 emit("v", {type = "str", val = t})
-	      end
 	   end
       end },
 
@@ -249,7 +245,7 @@ local function parser(get)
 	 s.inline = t.val
 	 t = get()
       else
-	 s.type = "nul"
+	 s.type = "str"
 	 s.val = ""
       end
 
