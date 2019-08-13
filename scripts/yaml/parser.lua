@@ -19,23 +19,36 @@ local function lexer(s, match_string)
       end
    end
 
-   local level = {-1}
+   local level = {{-1}}
    local flevel = {}
+   local function fix_pos(pos)
+      for _, v in ipairs(level) do
+	 if pos >= v[1] and v[2] == tree.ARRAY then
+	    pos = pos + 1
+	 end
+      end
+      return pos
+   end
    local function emit_brackets(pos, tp)
       if #flevel > 0 then
 	 return
       end
 
-      if pos > level[#level] then
-	 table.insert(level, pos)
+      pos = fix_pos(pos)
+      if tp == tree.ARRAY then
+	 pos = pos + 1
+      end
+
+      if pos > level[#level][1] then
+	 table.insert(level, {pos, tp})
 	 emit("{", tp)
       else
-	 while pos < level[#level] do
+	 while pos < level[#level][1] do
 	    table.remove(level)
 	    emit("}", false)
 	 end
 
-	 if pos ~= level[#level] then
+	 if pos ~= level[#level][1] then
 	    error("emit_brackets")
 	 end
       end
@@ -45,7 +58,7 @@ local function lexer(s, match_string)
 	 return
       end
 
-      if pos < level[#level] then
+      if fix_pos(pos) <= level[#level][1] then
 	 error("check indent")
       end
    end
@@ -59,7 +72,7 @@ local function lexer(s, match_string)
    local matchers = {
       { m = match("(%-)[ \n]"),
 	a = function (t, pos)
-	   emit_brackets(pos + 1, tree.ARRAY)
+	   emit_brackets(pos, tree.ARRAY)
 	   emit("-", t)
       end },
 
