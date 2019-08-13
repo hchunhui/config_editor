@@ -219,8 +219,16 @@ local function parser(get)
       local pcmt = pop_comment()
 
       if t and t.type == "v" then
-	 s = tree.new(tree.PRIM, t.val)
+	 local v = t.val
 	 t = get()
+	 if string.find(v, "^[^\"'|>]") then
+	    while t and t.type == "v" and
+	    string.find(t.val, "^[^\"'|>]") do
+	       v = v .. " " .. t.val
+	       t = get()
+	    end
+	 end
+	 s = tree.new(tree.PRIM, v)
       elseif t and t.type == "{" then
 	 local ty = t.val
 	 s = tree.new(ty)
