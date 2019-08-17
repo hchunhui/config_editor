@@ -47,12 +47,12 @@ struct LuaType<const char *> {
   }
 };
 
-std::string my_edit(struct nk_context *ctx, const char *str)
+std::string my_edit(struct nk_context *ctx, nk_flags flags, const char *str)
 {
     char buf[256];
     strncpy(buf, str, 256);
     buf[255] = 0;
-    nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD, buf, 256, nk_filter_default);
+    nk_edit_string_zero_terminated(ctx, flags, buf, 256, nk_filter_default);
     return std::string(buf);
 }
 

@@ -95,7 +95,7 @@ local function show_popup_map(ctx, cmds, path)
 	 end
       end
 
-      keyname = ctx:edit(keyname)
+      keyname = ctx:edit(nk.EDIT_FIELD, keyname)
       if ctx:button_label("paste") then
 	 local f = io.popen("xsel -b", "r")
 	 if f then
@@ -191,7 +191,7 @@ local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
 
       show_popup_val(ctx, v0)
       show_cmt(ctx, v0.cmt)
-      v0.val = ctx:edit(v0.val)
+      v0.val = ctx:edit(nk.EDIT_FIELD, v0.val)
    else
       ctx:layout_row_template_begin(25)
       ctx:layout_row_template_push_static(25 * #path)
