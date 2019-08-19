@@ -1,1 +1,1 @@
-dep all:
+dep all clean:
