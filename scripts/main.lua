@@ -17,12 +17,12 @@ local function path_show(path)
    return table.concat(path, "/")
 end
 
-local function tree_assoc(tree, key)
+local function tree_assoc(t, key)
    local j
    if key:sub(1, 1) == "@" then
       j = tonumber(key:sub(2, -1)) + 1
    else
-      for k, v in ipairs(tree.val) do
+      for k, v in ipairs(t.val) do
 	 if v.key == key then
 	    j = k
 	    break
@@ -32,36 +32,36 @@ local function tree_assoc(tree, key)
    return j
 end
 
-local function cmds_exec(cmds, tree)
+local function cmds_exec(cmds, t)
    for _, c in ipairs(cmds) do
       if c.type == "delete" then
 	 for i = 1, #c.path - 1 do
-	    local j = tree_assoc(tree, c.path[i])
-	    tree = tree.val[j].val
+	    local j = tree_assoc(t, c.path[i])
+	    t = t.val[j].val
 	 end
 	 if #c.path > 0 then
-	    local j = tree_assoc(tree, c.path[#c.path])
-	    table.remove(tree.val, j)
+	    local j = tree_assoc(t, c.path[#c.path])
+	    table.remove(t.val, j)
 	 end
       elseif c.type == "append" then
 	 for i = 1, #c.path do
-	    local j = tree_assoc(tree, c.path[i])
-	    tree = tree.val[j].val
+	    local j = tree_assoc(t, c.path[i])
+	    t = t.val[j].val
 	 end
-	 if tree.type == tree.MAP then
-	    table.insert(tree.val, {key = keyname, val = c.val})
-	 elseif tree.type == tree.ARRAY then
-	    table.insert(tree.val, {val = c.val})
+	 if t.type == tree.MAP then
+	    table.insert(t.val, {key = keyname, val = c.val})
+	 elseif t.type == tree.ARRAY then
+	    table.insert(t.val, {val = c.val})
 	 end
       elseif c.type == "prepend" then
 	 for i = 1, #c.path do
-	    local j = tree_assoc(tree, c.path[i])
-	    tree = tree.val[j].val
+	    local j = tree_assoc(t, c.path[i])
+	    t = t.val[j].val
 	 end
-	 if tree.type == tree.MAP then
-	    table.insert(tree.val, 1, {key = keyname, val = c.val})
-	 elseif tree.type == tree.ARRAY then
-	    table.insert(tree.val, 1, {val = c.val})
+	 if t.type == tree.MAP then
+	    table.insert(t.val, 1, {key = keyname, val = c.val})
+	 elseif t.type == tree.ARRAY then
+	    table.insert(t.val, 1, {val = c.val})
 	 end
       end
    end
