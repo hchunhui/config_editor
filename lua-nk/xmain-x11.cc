@@ -18,7 +18,6 @@
 #include "nuklear/nuklear_xlib.h"
 #include "lib/lua_templates.h"
 
-#define DTIME           20
 #define WINDOW_WIDTH    800
 #define WINDOW_HEIGHT   800
 
@@ -47,25 +46,6 @@ die(const char *fmt, ...)
     va_end(ap);
     fputs("\n", stderr);
     exit(EXIT_FAILURE);
-}
-
-static long
-timestamp(void)
-{
-    struct timeval tv;
-    if (gettimeofday(&tv, NULL) < 0) return 0;
-    return (long)((long)tv.tv_sec * 1000 + (long)tv.tv_usec/1000);
-}
-
-static void
-sleep_for(long t)
-{
-    struct timespec req;
-    const time_t sec = (int)(t/1000);
-    const long ms = t - (sec * 1000);
-    req.tv_sec = sec;
-    req.tv_nsec = ms * 1000000L;
-    while(-1 == nanosleep(&req, &req));
 }
 
 #include "nuklear/style.c"
@@ -132,18 +112,18 @@ xmain(std::shared_ptr<LuaObj> gui)
     /*set_style(ctx, THEME_BLUE);*/
     /*set_style(ctx, THEME_DARK);*/
 
-    while (running)
+    XEvent evt;
+    while (running && !XNextEvent(xw.dpy, &evt))
     {
         /* Input */
-        XEvent evt;
-        started = timestamp();
+        if (evt.type == NoExpose)
+            continue;
+        if (XFilterEvent(&evt, xw.win))
+            continue;
+        if (evt.type == ClientMessage) goto cleanup;
+
         nk_input_begin(ctx);
-        while (XPending(xw.dpy)) {
-            XNextEvent(xw.dpy, &evt);
-            if (evt.type == ClientMessage) goto cleanup;
-            if (XFilterEvent(&evt, xw.win)) continue;
-            nk_xlib_handle_event(xw.dpy, xw.screen, xw.win, &evt);
-        }
+        nk_xlib_handle_event(xw.dpy, xw.screen, xw.win, &evt);
         nk_input_end(ctx);
 
         /* GUI */
@@ -161,11 +141,6 @@ xmain(std::shared_ptr<LuaObj> gui)
         XClearWindow(xw.dpy, xw.win);
         nk_xlib_render(xw.win, nk_rgb(30,30,30));
         XFlush(xw.dpy);
-
-        /* Timing */
-        dt = timestamp() - started;
-        if (dt < DTIME)
-            sleep_for(DTIME - dt);
     }
 
 cleanup:
