@@ -1,20 +1,21 @@
 Q ?= @
 TOPDIR ?= .
 SELF ?= Makefile
+PLAT ?=
 
 # Toplevel rules
 .PHONY: all clean topdir sub_all _all dep
 .SUFFIXES:
 
 all: dep
-	${Q}${MAKE} -f ${SELF} sub_all
-	${Q}${MAKE} -f ${SELF} _all
+	${Q}${MAKE} -f ${SELF} PLAT=${PLAT} sub_all
+	${Q}${MAKE} -f ${SELF} PLAT=${PLAT} _all
 
 clean:
 	${Q}rm -rf ${EXTRA_CLEAN}
 
 topdir:
-	${Q}${MAKE} -C ${TOPDIR}
+	${Q}${MAKE} -C ${TOPDIR} PLAT=${PLAT}
 
 
 # Sub rules
@@ -27,11 +28,11 @@ clean: ${SUBDIRS:=.clean}
 dep: ${SUBDIRS:=.dep}
 
 ${SUBDIRS:=.all}:
-	${Q}${MAKE} -C ${@:.all=}
+	${Q}${MAKE} -C ${@:.all=} PLAT=${PLAT}
 ${SUBDIRS:=.clean}:
-	${Q}${MAKE} -C ${@:.clean=} clean
+	${Q}${MAKE} -C ${@:.clean=} PLAT=${PLAT} clean
 ${SUBDIRS:=.dep}:
-	${Q}${MAKE} -C ${@:.dep=} dep
+	${Q}${MAKE} -C ${@:.dep=} PLAT=${PLAT} dep
 
 
 .PHONY: ${SUBMAKES:=.all} ${SUBMAKES:=.clean} ${SUBMAKES:=.dep}
@@ -43,11 +44,11 @@ clean: ${SUBMAKES:=.clean}
 dep: ${SUBMAKES:=.dep}
 
 ${SUBMAKES:=.all}:
-	${Q}${MAKE} -f ${@:.all=} SELF=${@:.all=}
+	${Q}${MAKE} -f ${@:.all=} SELF=${@:.all=} PLAT=${PLAT}
 ${SUBMAKES:=.clean}:
-	${Q}${MAKE} -f ${@:.clean=} SELF=${@:.clean=} clean
+	${Q}${MAKE} -f ${@:.clean=} SELF=${@:.clean=} PLAT=${PLAT} clean
 ${SUBMAKES:=.dep}:
-	${Q}${MAKE} -f ${@:.dep=} SELF=${@:.dep=} dep
+	${Q}${MAKE} -f ${@:.dep=} SELF=${@:.dep=} PLAT=${PLAT} dep
 
 
 # Link rules

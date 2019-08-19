@@ -1,3 +1,4 @@
+PLAT ?= x11
 TOPDIR = ..
 PROG = _build.o
 CSRCS = _helper.c
@@ -7,11 +8,12 @@ LDFLAGS = -r -nostdlib
 
 include ${TOPDIR}/make/comm.mk
 include ${TOPDIR}/make/c.mk
+include ${TOPDIR}/user.mk
 
 .PHONY: clean_helper
 
 _helper.c: ${LUASRCS} Makefile
-	${Q}./mkhelper ${LUASRCS} > $@
+	${Q}./mkhelper-${PLAT} ${LUASRCS} > $@
 
 clean_helper:
 	${Q}rm -f _helper.c

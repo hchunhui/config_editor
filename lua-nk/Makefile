@@ -1,8 +1,9 @@
+PLAT ?= x11
 TOPDIR = ..
 SUBDIRS = lib
-SUBMAKES = build.mk shared.mk static.mk
+SUBMAKES = build.mk shared-${PLAT}.mk static.mk
 
 include ${TOPDIR}/make/comm.mk
 
-shared.mk.all: build.mk.all lib.all
+shared-${PLAT}.mk.all: build.mk.all lib.all
 static.mk.all: build.mk.all lib.all

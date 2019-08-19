@@ -1,3 +1,4 @@
+PLAT ?= x11
 TOPDIR = .
 SUBDIRS = lua-nk scripts driver
 

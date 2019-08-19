@@ -1,0 +1,28 @@
+#!/bin/sh
+cat << 'EOF'
+#include <stddef.h>
+
+struct mem_file {
+  const char *name;
+  const char *start;
+  const char *end;
+};
+
+EOF
+
+ALL="$(echo "$@" | tr ' /' '\n.')"
+
+echo "$ALL" | sed 's/^\(.*\)$/extern const char binary_\1_start[];\nextern const char binary_\1_end[];/g' | tr '.' '_'
+
+cat << 'EOF'
+
+struct mem_file _myfiles[] = {
+EOF
+
+echo "$ALL" | sed 's/^\(.*\)\.lua$/  {"\1",\n   binary_\1_lua_start, binary_\1_lua_end },/g' |
+    sed 'n; s/\./_/g'
+
+cat << 'EOF'
+  { NULL, NULL, NULL }
+};
+EOF

@@ -1,6 +1,6 @@
 TOPDIR = ..
 PROG = build.o
-CXXSRCS = types.cc xmain.cc
+CXXSRCS = types.cc xmain-${PLAT}.cc
 
 LDFLAGS = -r -nostdlib
 
