@@ -66,7 +66,7 @@ local function match_rstring(s, i, unsafe) --- str
 end
 
 local function match_xstring(s, i) --- XXX: |str >str
-   local r1, r2 = string.match(s, "^([|>][%+%-]?\n)([ ]+)", i)
+   local r1, r2 = string.match(s, "^([|>][%+%-]?\n+)([ ]+)", i)
    if r1 then
       local n = string.len(r2)
       local j = i + string.len(r1)
