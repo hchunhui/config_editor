@@ -41,14 +41,14 @@ end
 
 local function match_rstring(s, i, unsafe) --- str
    local set1 = "^[^ :#\n]"
-   local set2 = "^[^:#\n]+"
+   local set2 = "^[^:\n]+"
    if unsafe then
       set1 = "^[^ ,{}%[%]:#\n]"
-      set2 = "^[^,{}%[%]:#\n]+"
+      set2 = "^[^,{}%[%]:\n]+"
    end
 
    local t = {}
-   local r = string.match(s, set1, i)
+   local r = string.match(s, set1, i) or string.match(s, "^(:)[^ \n]", i)
    if not r then return nil end
 
    while r do
