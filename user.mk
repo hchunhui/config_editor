@@ -21,6 +21,6 @@ LUA_LDFLAGS-x11 = -L${TOPDIR} -llua -lm -ldl
 CC-win32 = i686-w64-mingw32-gcc
 CXX-win32 = i686-w64-mingw32-g++
 AR-win32 = i686-w64-mingw32-ar
-NK_LDFLAGS-win32 = -lgdi32 -lmsimg32 -static-libstdc++ -static-libgcc
+NK_LDFLAGS-win32 = -lgdi32 -lmsimg32 -static-libstdc++ -static-libgcc -mwindows
 LUA_CFLAGS-win32 = -I${TOPDIR}/thirdparty/lua5.3
 LUA_LDFLAGS-win32 = -L${TOPDIR} -llua-win32
