@@ -70,7 +70,7 @@ end
 local function show_popup_str(ctx, cmds, path)
    local bounds = ctx:widget_bounds()
    if ctx:contextual_begin(0, nk.vec2(100, 300), bounds) then
-      ctx:layout_row_dynamic(25, 1);
+      ctx:layout_row_dynamic(30, 1);
       ctx:label(path_show(path), nk.TEXT_LEFT)
       if ctx:button_label("delete") then
 	 table.insert(cmds, {type = "delete", path = path})
@@ -86,7 +86,7 @@ end
 local function show_popup_map(ctx, cmds, path)
    local bounds = ctx:widget_bounds()
    if ctx:contextual_begin(0, nk.vec2(100, 300), bounds) then
-      ctx:layout_row_dynamic(25, 1);
+      ctx:layout_row_dynamic(30, 1);
       ctx:label(path_show(path), nk.TEXT_LEFT)
       if #path > 0 then
 	 if ctx:button_label("delete") then
@@ -129,7 +129,7 @@ end
 local function show_popup_val(ctx, v)
    local bounds = ctx:widget_bounds()
    if ctx:contextual_begin(0, nk.vec2(100, 300), bounds) then
-      ctx:layout_row_dynamic(25, 1);
+      ctx:layout_row_dynamic(30, 1);
       ctx:label(v.val, nk.TEXT_LEFT)
 
       if ctx:button_label("copy") then
@@ -155,8 +155,8 @@ end
 
 local function show_pcmt(ctx, n, pcmt)
    if pcmt then
-      ctx:layout_row_template_begin(25)
-      ctx:layout_row_template_push_static(25 * n)
+      ctx:layout_row_template_begin(30)
+      ctx:layout_row_template_push_static(30 * n)
       ctx:layout_row_template_push_dynamic()
       ctx:layout_row_template_end()
       for l in string.gmatch(pcmt, "[ ]*([^\n]*)") do
@@ -177,9 +177,9 @@ end
 local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
    if v0.type == tree.PRIM then
       show_pcmt(ctx, #path + 1, v0.pcmt)
-      ctx:layout_row_template_begin(25)
-      ctx:layout_row_template_push_static(25 * (#path + 1))
-      ctx:layout_row_template_push_static(275 - 25 * #path)
+      ctx:layout_row_template_begin(30)
+      ctx:layout_row_template_push_static(30 * (#path + 1))
+      ctx:layout_row_template_push_static(275 - 30 * #path)
       ctx:layout_row_template_push_dynamic()
       ctx:layout_row_template_end()
 
@@ -193,9 +193,9 @@ local function show_tree(ctx, hide, cmds, path, k0, v0, cmt)
       show_cmt(ctx, v0.cmt)
       v0.val = ctx:edit(nk.EDIT_FIELD, v0.val)
    else
-      ctx:layout_row_template_begin(25)
-      ctx:layout_row_template_push_static(25 * #path)
-      ctx:layout_row_template_push_static(25)
+      ctx:layout_row_template_begin(30)
+      ctx:layout_row_template_push_static(30 * #path)
+      ctx:layout_row_template_push_static(30)
       ctx:layout_row_template_push_dynamic()
       ctx:layout_row_template_end()
 
@@ -240,7 +240,7 @@ function mkgui()
    function gui(ctx)
       if ctx:_begin("Demo", nk.rect(0, 0, 800, 800), 0) then
 
-	 ctx:layout_row_dynamic(25, 1)
+	 ctx:layout_row_dynamic(30, 1)
 	 ctx:label("Config Editor", nk.TEXT_LEFT)
 
 	 local cmds = {}

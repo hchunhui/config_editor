@@ -76,7 +76,7 @@ xmain(std::shared_ptr<LuaObj> gui)
     dc = GetDC(wnd);
 
     /* GUI */
-    font = nk_gdifont_create("Arial", 14);
+    font = nk_gdifont_create("Arial", 16);
     ctx = nk_gdi_init(font, dc, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     /* style.c */
