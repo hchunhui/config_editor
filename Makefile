@@ -16,7 +16,7 @@ include ${TOPDIR}/user.mk
 .PHONY: clean_helper
 
 _helper.inc: ${SUBDIRS:=/luafiles}
-	${Q}./mkhelper-${PLAT} $^$> > $@
+	${Q}./mkhelper $^$> > $@
 
 _chelper.inc: ${SUBDIRS:=/modules}
 	${Q}./mkchelper $^$> > $@
