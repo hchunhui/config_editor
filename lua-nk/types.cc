@@ -34,6 +34,45 @@ struct LuaType<const char *> {
   }
 };
 
+namespace BufferReg {
+    typedef std::vector<char> T;
+    static T make(const char *s)
+    {
+        int l = strlen(s) + 1;
+        return std::vector<char>(s, s + l);
+    }
+
+    static int raw_tostring(lua_State *L)
+    {
+        T &v = LuaType<T>::todata(L, 1);
+        lua_pushlstring(L, v.data(), v.size());
+        return 1;
+    }
+
+    static const luaL_Reg funcs[] = {
+        { "buffer", WRAP(make) },
+        { NULL, NULL },
+    };
+
+    static const luaL_Reg methods[] = {
+        { "tostring", raw_tostring },
+        { NULL, NULL },
+    };
+
+    static const luaL_Reg vars_get[] = {
+        { NULL, NULL },
+    };
+
+    static const luaL_Reg vars_set[] = {
+        { NULL, NULL },
+    };
+}
+
+static void my_edit2(struct nk_context *ctx, nk_flags flags, std::vector<char> &str)
+{
+    nk_edit_string_zero_terminated(ctx, flags, str.data(), str.size(), nk_filter_default);
+}
+
 std::string my_edit(struct nk_context *ctx, nk_flags flags, const char *str)
 {
     char buf[256];
@@ -232,6 +271,7 @@ namespace NkContextReg {
     { "propertyd", WRAP(nk_propertyd) },
     // edit
     { "edit", WRAP(my_edit) },
+    { "edit2", WRAP(my_edit2) },
     { "edit_focus", WRAP(nk_edit_focus) },
     { "edit_unfocus", WRAP(nk_edit_unfocus) },
     // chart
@@ -488,6 +528,7 @@ void types_init(lua_State *L) {
   EXPORT(NkColorReg, L);
   EXPORT(NkRectReg, L);
   EXPORT(NkVec2Reg, L);
+  EXPORT(BufferReg, L);
 }
 
 int xmain(std::shared_ptr<LuaObj> gui);

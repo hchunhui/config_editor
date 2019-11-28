@@ -268,6 +268,7 @@ struct LuaType<const std::string &> : LuaType<std::string> {};
 
 // Arrays
 // The index starts form 1 in Lua...
+#if 0
 template<typename T>
 struct LuaType<std::vector<T>> {
   static void pushdata(lua_State *L, std::vector<T> &o) {
@@ -289,6 +290,7 @@ struct LuaType<std::vector<T>> {
     return o;
   }
 };
+#endif
 
 // Sets
 template<typename T>
