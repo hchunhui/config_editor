@@ -1,5 +1,5 @@
 TOPDIR = .
-SELF ?= thirdparty-win.mk
+SELF ?= thirdparty-win32.mk
 LIB = liblua-win32.a
 CSRCS = \
  thirdparty/lua5.3/lapi.c \
