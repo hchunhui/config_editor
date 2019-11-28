@@ -1,0 +1,21 @@
+#!/bin/sh
+ALL="$(echo "$@" | xargs cat | tr ' /' '\n.')"
+
+if [ -n "$ALL" ]; then
+echo "$ALL" | sed 's/^\(.*\)$/int luaopen_\1(lua_State *L);/g' | tr '.' '_'
+fi
+
+cat << 'EOF'
+
+struct mem_cfile _mycfiles[] = {
+EOF
+
+if [ -n "$ALL" ]; then
+echo "$ALL" | sed 's/^\(.*\)$/  {"\1",\n   luaopen_\1 },/g' |
+    sed 'n; s/\./_/g'
+fi
+
+cat << 'EOF'
+  { NULL, NULL }
+};
+EOF

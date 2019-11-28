@@ -32,19 +32,14 @@ struct mem_cfile {
   lua_CFunction func;
 };
 
-extern struct mem_file _myfiles[];
-
-int luaopen_nk_core (lua_State *L);
-struct mem_cfile _mycfiels[] = {
-  {"nk.core", luaopen_nk_core},
-  {NULL, NULL},
-};
+#include "_helper.inc"
+#include "_chelper.inc"
 
 static int my_loader(lua_State *L)
 {
   const char *name = luaL_checkstring(L, 1);
   struct mem_file *p = _myfiles;
-  struct mem_cfile *q = _mycfiels;
+  struct mem_cfile *q = _mycfiles;
 
   for(; p->name; p++) {
     if (strcmp(name, p->name) == 0) {

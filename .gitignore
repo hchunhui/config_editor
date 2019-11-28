@@ -3,6 +3,7 @@
 *.o
 *.a
 *.so
-driver/driver
-scripts/_helper.c
-scripts/nk.so
+main.exe
+_helper.inc
+_chelper.inc
+thirdparty

@@ -1,5 +1,10 @@
 TOPDIR = ..
-LIB = nk.a
+PROG = _build.o
 OBJS = build.o lib/build.o
+LUASRCS != cat luafiles
+
+LDFLAGS = -r -nostdlib
 
 include ${TOPDIR}/make/comm.mk
+include ${TOPDIR}/make/lua.mk
+include ${TOPDIR}/user.mk
