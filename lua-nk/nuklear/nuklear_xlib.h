@@ -21,7 +21,7 @@ NK_API struct nk_context*   nk_xlib_init(XFont*, Display*, int scrn, Window root
 #else
 NK_API struct nk_context*   nk_xlib_init(XFont*, Display*, int scrn, Window root, unsigned w, unsigned h);
 #endif
-NK_API int                  nk_xlib_handle_event(Display*, int scrn, Window, XEvent*);
+NK_API int                  nk_xlib_handle_event(Display*, int scrn, Window, XIC, XEvent*);
 NK_API void                 nk_xlib_render(Drawable screen, struct nk_color clear);
 NK_API void                 nk_xlib_shutdown(void);
 NK_API void                 nk_xlib_set_font(XFont*);
@@ -761,7 +761,7 @@ nk_xlib_copy(nk_handle handle, const char* str, int len)
 }
 
 NK_API int
-nk_xlib_handle_event(Display *dpy, int screen, Window win, XEvent *evt)
+nk_xlib_handle_event(Display *dpy, int screen, Window win, XIC xic, XEvent *evt)
 {
     struct nk_context *ctx = &xlib.ctx;
 
@@ -779,8 +779,12 @@ nk_xlib_handle_event(Display *dpy, int screen, Window win, XEvent *evt)
     if (evt->type == KeyPress || evt->type == KeyRelease)
     {
         /* Key handler */
-        int ret, down = (evt->type == KeyPress);
-        KeySym *code = XGetKeyboardMapping(xlib.surf->dpy, (KeyCode)evt->xkey.keycode, 1, &ret);
+        int down = (evt->type == KeyPress);
+        Status status;
+        char buf[32];
+        KeySym keysym, *code = &keysym;
+        status = Xutf8LookupString(xic, &(evt->xkey), buf, 32, &keysym, &status);
+
         if (*code == XK_Shift_L || *code == XK_Shift_R) nk_input_key(ctx, NK_KEY_SHIFT, down);
         else if (*code == XK_Delete)    nk_input_key(ctx, NK_KEY_DEL, down);
         else if (*code == XK_Return)    nk_input_key(ctx, NK_KEY_ENTER, down);
@@ -824,14 +828,11 @@ nk_xlib_handle_event(Display *dpy, int screen, Window win, XEvent *evt)
                 else if (*code == 'r')
                     nk_input_key(ctx, NK_KEY_TEXT_REPLACE_MODE, down);
                 if (down) {
-                    char buf[32];
-                    KeySym keysym = 0;
-                    if (XLookupString((XKeyEvent*)evt, buf, 32, &keysym, NULL) != NoSymbol)
+                    if (status != NoSymbol)
                         nk_input_glyph(ctx, buf);
                 }
             }
         }
-        XFree(code);
         return 1;
     } else if (evt->type == ButtonPress || evt->type == ButtonRelease) {
         /* Button handler */

@@ -65,6 +65,8 @@ xmain(std::shared_ptr<LuaObj> gui)
     int running = 1;
     struct nk_context *ctx;
 
+    setlocale(LC_ALL, "");
+
     /* X11 */
     memset(&xw, 0, sizeof xw);
     xw.dpy = XOpenDisplay(NULL);
@@ -103,6 +105,22 @@ xmain(std::shared_ptr<LuaObj> gui)
     xw.width = (unsigned int)xw.attr.width;
     xw.height = (unsigned int)xw.attr.height;
 
+    XSetLocaleModifiers("");
+
+    XIM xim = XOpenIM(xw.dpy, 0, 0, 0);
+    if(!xim){
+        // fallback to internal input method
+        XSetLocaleModifiers("@im=none");
+        xim = XOpenIM(xw.dpy, 0, 0, 0);
+    }
+
+    XIC xic = XCreateIC(xim,
+                        XNInputStyle,   XIMPreeditNothing | XIMStatusNothing,
+                        XNClientWindow, xw.win,
+                        XNFocusWindow,  xw.win,
+                        NULL);
+    XSetICFocus(xic);
+
     /* GUI */
     xw.font = nk_xfont_create(xw.dpy, "Source Han Sans SC:pixelsize=12");
     ctx = nk_xlib_init(xw.font, xw.dpy, xw.screen, xw.win, xw.vis, xw.cmap, xw.width, xw.height);
@@ -118,12 +136,12 @@ xmain(std::shared_ptr<LuaObj> gui)
         /* Input */
         if (evt.type == NoExpose)
             continue;
-        if (XFilterEvent(&evt, xw.win))
+        if (XFilterEvent(&evt, None) == True)
             continue;
         if (evt.type == ClientMessage) goto cleanup;
 
         nk_input_begin(ctx);
-        nk_xlib_handle_event(xw.dpy, xw.screen, xw.win, &evt);
+        nk_xlib_handle_event(xw.dpy, xw.screen, xw.win, xic, &evt);
         nk_input_end(ctx);
 
         /* GUI */
