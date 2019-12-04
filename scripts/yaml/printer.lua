@@ -20,7 +20,7 @@ local function printer(quote)
 	       if x.pcmt then table.insert(s, x.pcmt) end
 	       local v = rec(x.val, n + 2, unsafe)
 	       local qkey = quote(key, n, unsafe)
-	       if x.cmt or (x.val.type ~= tree.PRIM and not x.val.inline) then
+	       if x.cmt or (x.val.type ~= tree.PRIM and not x.val.inline and x.val:iter_len() > 0) then
 		  x.cmt = x.cmt or ""
 		  table.insert(s, string.rep(" ", n) .. qkey .. ":" .. x.cmt .. "\n" .. v)
 	       else
