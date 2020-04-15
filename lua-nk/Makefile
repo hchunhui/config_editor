@@ -1,4 +1,4 @@
-PLAT ?= x11
+export PLAT ?= x11
 TOPDIR = ..
 SUBDIRS = lib
 SUBMAKES = build.mk shared-${PLAT}.mk static.mk

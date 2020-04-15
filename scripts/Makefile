@@ -1,4 +1,4 @@
-PLAT ?= x11
+export PLAT ?= x11
 TOPDIR = ..
 PROG = _build.o
 LUASRCS != cat luafiles

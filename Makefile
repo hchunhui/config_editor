@@ -1,6 +1,6 @@
 SUBDIRS = lua-nk scripts
 
-PLAT ?= x11
+export PLAT ?= x11
 TOPDIR = .
 PROG = main.exe
 CSRCS = main.c
