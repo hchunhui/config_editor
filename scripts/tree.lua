@@ -32,7 +32,9 @@ local function map_set(tree, key, val, cmt, pcmt)
 	 return
       end
    end
-   table.insert(tree.val, {key = key, val = val, cmt = cmt, pcmt = pcmt})
+   if val ~= nil then
+      table.insert(tree.val, {key = key, val = val, cmt = cmt, pcmt = pcmt})
+   end
 end
 
 local map_intf = {
@@ -92,25 +94,25 @@ local function new(type, val)
    return r
 end
 
-local function lower(tree)
+local function lower(tree, unquote)
    if tree.type == PRIM then
-      return tree.val
+      return unquote(tree.val)
    elseif tree.type == MAP then
       local r = {}
       for k, v in map_iter(tree) do
-	 r[k] = lower(v.val)
+	 r[k] = lower(v.val, unquote)
       end
       return r
    elseif tree.type == ARRAY then
       local r = {}
       for _, v in array_iter(tree) do
-	 table.insert(r, lower(v.val))
+	 table.insert(r, lower(v.val, unquote))
       end
       return r
    end
 end
 
-local function lift(root)
+local function lift(root, quote)
    function is_array(t)
       if #t > 0 then
 	 return true
@@ -128,16 +130,16 @@ local function lift(root)
       if is_array(root) then
 	 r = new(ARRAY)
 	 for i, x in ipairs(root) do
-	    array_set(r, i, lift(x))
+	    array_set(r, i, lift(x, quote))
 	 end
       else
 	 r = new(MAP)
 	 for k, v in pairs(root) do
-	    map_set(r, tostring(k), lift(v))
+	    map_set(r, quote(k), lift(v, quote))
 	 end
       end
    else
-      r = new(PRIM, tostring(root))
+      r = new(PRIM, quote(root))
    end
    return r
 end
