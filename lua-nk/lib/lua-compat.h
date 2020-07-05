@@ -9,7 +9,14 @@ void luaL_setmetatable (lua_State *L, const char *tname);
 void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup);
 #endif
 
-#if LUA_VERSION_NUM >= 502
+#if LUA_VERSION_NUM >= 504
+static inline int xlua_resume(lua_State *L, int nargs)
+{
+	int nres;
+	return lua_resume(L, NULL, nargs, &nres);
+}
+#define LUA_UNPACK "table.unpack"
+#elif LUA_VERSION_NUM >= 502
 #define xlua_resume(L, a) lua_resume(L, NULL, a)
 #define LUA_UNPACK "table.unpack"
 #else
