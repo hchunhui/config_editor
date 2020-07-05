@@ -1,9 +1,8 @@
 export PLAT ?= x11
 TOPDIR = ..
-SUBDIRS = lib
-SUBMAKES = build.mk shared-${PLAT}.mk static.mk
+SUBMAKES = lib.mk build.mk shared-${PLAT}.mk static.mk
 
 include ${TOPDIR}/make/comm.mk
 
-shared-${PLAT}.mk.all: build.mk.all lib.all
-static.mk.all: build.mk.all lib.all
+shared-${PLAT}.mk.all: build.mk.all lib.mk.all
+static.mk.all: build.mk.all lib.mk.all

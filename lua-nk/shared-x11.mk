@@ -1,6 +1,6 @@
 TOPDIR = ..
 PROG = nk.so
-OBJS = build.o lib/build.o
+OBJS = build.o lib.o
 
 LDFLAGS = -shared ${NK_LDFLAGS}
 

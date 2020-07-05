@@ -1,6 +1,6 @@
 TOPDIR = ..
 PROG = _build.o
-OBJS = build.o lib/build.o
+OBJS = build.o lib.o
 LUASRCS != cat luafiles
 
 LDFLAGS = -r -nostdlib

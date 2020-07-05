@@ -1,7 +1,7 @@
-TOPDIR = ../..
-PROG = build.o
-CXXSRCS = lua.cc
-CSRCS = lutf8lib-compat.c lauxlib-compat.c
+TOPDIR = ..
+PROG = lib.o
+CXXSRCS = lib/lua.cc
+CSRCS = lib/lutf8lib-compat.c lib/lauxlib-compat.c
 
 LDFLAGS = -r -nostdlib
 
