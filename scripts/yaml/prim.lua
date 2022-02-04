@@ -15,7 +15,9 @@ local function match_qstring(s, i) --- "str"
 	 string.match(s, "^\\[abefnrtv\\'\"?]", i) or
 	 -- YAML specific
 	 string.match(s, "^\\[/N_LP \t]", i) or
-	 string.match(s, "^[^\"\\]+", i)
+	 string.match(s, "^[^\"\\]+", i) or
+	 -- Escape "\n"
+	 string.match(s, "^\\\n[ ]*", i)
    end
 
    r = string.match(s, "^\"", i)
@@ -66,7 +68,7 @@ local function match_rstring(s, i, unsafe) --- str
 end
 
 local function match_xstring(s, i) --- XXX: |str >str
-   local r1, r2 = string.match(s, "^([|>][%+%-]?\n+)([ ]+)", i)
+   local r1, r2 = string.match(s, "^([|>][%+%-]?[^\n]*\n+)([ ]+)", i)
    if r1 then
       local n = string.len(r2)
       local j = i + string.len(r1)
@@ -74,7 +76,8 @@ local function match_xstring(s, i) --- XXX: |str >str
 	 local l = string.match(s, "^[^\n]*\n", j)
 	 if l then
 	    local m = string.len(string.match(l, "^[ ]*"))
-	    if l ~= "\n" then
+	    local is_empty_line = string.match(l, "^[ ]*\n")
+	    if is_empty_line == nil then
 	       if m < n then
 		  break
 	       end

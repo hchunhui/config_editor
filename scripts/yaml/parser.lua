@@ -2,8 +2,10 @@ local tree = require("tree")
 
 local function lexer(s, match_string)
    local pend = {}
+   local prev
    local function emit(t, v)
-      table.insert(pend, {type = t, val = v})
+      prev = {type = t, val = v}
+      table.insert(pend, prev)
    end
 
    local i = 1
@@ -63,6 +65,18 @@ local function lexer(s, match_string)
       end
    end
 
+   local function maybe_string(t, pos, felse)
+      if prev and prev.type == "v" and
+	 fix_pos(pos) > level[#level][1]
+      then
+	 local x = match_string(s, i, flevel) or ""
+	 update(x)
+	 emit("v", t .. x)
+      else
+	 felse()
+      end
+   end
+
    local function match(c)
       return function (s, i)
 	 return string.match(s, "^" .. c, i)
@@ -72,17 +86,21 @@ local function lexer(s, match_string)
    local matchers = {
       { m = match("(%-)[ \n]"),
 	a = function (t, pos)
-	   emit_brackets(pos, tree.ARRAY)
-	   emit("-", t)
+	   maybe_string(t, pos, function ()
+			   emit_brackets(pos, tree.ARRAY)
+			   emit("-", t)
+	   end)
       end },
 
       { m = match("{"),
-	a = function (t)
+	a = function (t, pos)
 	   if flevel[#flevel] == "[" then
 	      emit("-", "")
 	   end
-	   table.insert(flevel, "{")
-	   emit("{", tree.MAP)
+	   maybe_string(t, pos, function ()
+			   table.insert(flevel, "{")
+			   emit("{", tree.MAP)
+	   end)
       end },
 
       { m = match("}"),
@@ -95,12 +113,14 @@ local function lexer(s, match_string)
       end },
 
       { m = match("%["),
-	a = function (t)
+	a = function (t, pos)
 	   if flevel[#flevel] == "[" then
 	      emit("-", "")
 	   end
-	   table.insert(flevel, "[")
-	   emit("{", tree.ARRAY)
+	   maybe_string(t, pos, function ()
+			   table.insert(flevel, "[")
+			   emit("{", tree.ARRAY)
+	   end)
       end },
 
       { m = match("%]"),
@@ -151,7 +171,8 @@ local function lexer(s, match_string)
    return function ()
       while true do
 	 if #pend > 0 then
-	    return table.remove(pend, 1)
+	    local t = table.remove(pend, 1)
+	    return t
 	 end
 
 	 local flag = true
@@ -235,8 +256,7 @@ local function parser(get)
 	 local v = t.val
 	 t = get()
 	 if string.find(v, "^[^\"'|>]") then
-	    while t and t.type == "v" and
-	    string.find(t.val, "^[^\"'|>]") do
+	    while t and t.type == "v" do
 	       v = v .. " " .. t.val
 	       t = get()
 	    end
