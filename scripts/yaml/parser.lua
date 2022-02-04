@@ -33,6 +33,11 @@ local function lexer(s, match_string)
    end
    local function emit_brackets(pos, tp)
       if #flevel > 0 then
+	 if flevel[#flevel] == "[" and tp == tree.MAP then
+	    emit("-", "")
+	    table.insert(flevel, "{{")
+	    emit("{", tp)
+	 end
 	 return
       end
 
@@ -125,15 +130,27 @@ local function lexer(s, match_string)
 
       { m = match("%]"),
 	a = function (t)
-	   if #flevel == 0 or
-	   table.remove(flevel) ~= "[" then
+	   if #flevel == 0 then
+	      error("match ]")
+	   end
+	   local ftop = table.remove(flevel)
+	   if ftop == "{{" then
+	      emit("}", true)
+	      ftop = table.remove(flevel)
+	   end
+	   if ftop ~= "[" then
 	      error("match ]")
 	   end
 	   emit("}", true)
       end },
 
       { m = match(","),
-	a = function () end },
+	a = function ()
+	   if flevel[#flevel] == "{{" then
+	      table.remove(flevel)
+	      emit("}", true)
+	   end
+      end },
 
       { m = match_string,
 	a = function (t, pos)
